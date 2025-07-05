@@ -1,86 +1,152 @@
 package S5_02_Virtual_Pet_App.service;
 
+import S5_02_Virtual_Pet_App.dto.RegisterUserRequestDTO;
+import S5_02_Virtual_Pet_App.dto.UserDTO;
+import S5_02_Virtual_Pet_App.dto.UserResponseDTO;
 import S5_02_Virtual_Pet_App.model.Role;
 import S5_02_Virtual_Pet_App.model.User;
 import S5_02_Virtual_Pet_App.repository.UserRepository;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
+
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    // 🔒 Cargar usuario para autenticación
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-
-        logger.debug("User {} loaded successfully", username);
-        return user;
     }
 
-    public User createUser(String username, String email, String password) {
-        if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("Username already exists");
+    // 🟢 Crear usuario normal
+    public User createUser(@Valid UserDTO request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-        if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already exists");
-        }
+        User user = new User(
+                request.getUsername(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getRoles() == null ? Set.of(Role.USER) : request.getRoles()
+        );
 
-        User user = new User(username, email, passwordEncoder.encode(password), Set.of(Role.USER));
-        User savedUser = userRepository.save(user);
-
-        logger.info("New user created: {}", username);
-        return savedUser;
+        return userRepository.save(user);
     }
 
-    public User createAdmin(String username, String email, String password) {
-        User user = new User(username, email, passwordEncoder.encode(password), Set.of(Role.ADMIN, Role.USER));
-        User savedUser = userRepository.save(user);
-
-        logger.info("New admin created: {}", username);
-        return savedUser;
+    // 🟢 Crear administrador
+    public UserResponseDTO createAdmin(RegisterUserRequestDTO request) {
+        User user = new User(
+                request.getUsername(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                Set.of(Role.ADMIN, Role.USER)
+        );
+        return toDTO(userRepository.save(user));
     }
 
+    // 🕒 Actualizar último login
     public void updateLastLogin(String username) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
+        userRepository.findByUsername(username).ifPresent(user -> {
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
-
-            logger.debug("Last login updated for user: {}", username);
-        }
+        });
     }
 
-    public List<User> getAllUsers() {
+    // 🔍 Obtener todos los usuarios
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
+    // 🔍 Buscar por username
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    public void deleteUser(String userId) {
-        userRepository.deleteById(userId);
-        logger.info("User deleted: {}", userId);
+    // 🗑️ Eliminar por username
+    public void deleteByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        userRepository.delete(user);
+        logger.info("User deleted: {}", username);
+    }
+
+    // ✏️ Actualizar datos (nombre, email)
+    public User updateUser(String username, UserDTO request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            }
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            }
+            user.setUsername(request.getUsername());
+        }
+
+        return userRepository.save(user);
+    }
+
+    // 🔒 Cambiar contraseña
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect current password");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        logger.info("Password changed for user: {}", username);
+    }
+
+    // 🟡 Activar / desactivar cuenta
+    public User toggleEnabled(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setEnabled(!user.isEnabled());
+        return userRepository.save(user);
+    }
+
+    // 📦 Convertir entidad a DTO de respuesta
+    private UserResponseDTO toDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastLogin(user.getLastLogin());
+        dto.setRoles(user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
+        return dto;
     }
 }

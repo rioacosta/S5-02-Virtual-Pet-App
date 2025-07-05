@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-@WebMvcTest(PetCRUDController.class)
+@WebMvcTest(PetController.class)
 public class PetControllerTest {
 
     @Autowired

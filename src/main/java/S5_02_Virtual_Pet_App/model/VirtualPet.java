@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Document(collection = "virtual_pets")
+@Document(collection = "pets")
 public class VirtualPet {
     @Id
     private String id;
