@@ -52,28 +52,40 @@ public class VirtualPet {
 
     // Business methods
     public void meditate(int minutes) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusDays(1);
+
+        // Guardamos el día anterior de meditación, si existía
+        LocalDateTime previousMeditation = this.lastMeditation;
+
+        // Actualizamos métricas base
         this.totalMeditationMinutes += minutes;
         this.experience += minutes * 2;
-        this.happiness = Math.min(100, this.happiness + minutes);
-        this.lastMeditation = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.happiness = Math.min(100, this.happiness + (minutes / 2)); // gana felicidad proporcional
 
-        // Level up logic
+        this.lastMeditation = now;
+        this.updatedAt = now;
+
+        // Nivel arriba si alcanza la experiencia requerida
         int requiredExp = level * 100;
-        if (experience >= requiredExp) {
-            level++;
-            experience -= requiredExp;
+        while (this.experience >= requiredExp) {
+            this.level++;
+            this.experience -= requiredExp;
+            requiredExp = this.level * 100;
         }
 
-        // Update streak
-        if (lastMeditation != null &&
-                lastMeditation.toLocalDate().equals(LocalDateTime.now().toLocalDate().minusDays(1))) {
-            meditationStreak++;
-        } else if (lastMeditation == null ||
-                !lastMeditation.toLocalDate().equals(LocalDateTime.now().toLocalDate())) {
-            meditationStreak = 1;
+        // Lógica de racha de meditación
+        if (previousMeditation != null) {
+            if (previousMeditation.toLocalDate().equals(yesterday.toLocalDate())) {
+                this.meditationStreak++;
+            } else if (!previousMeditation.toLocalDate().equals(now.toLocalDate())) {
+                this.meditationStreak = 1;
+            } // Si medita dos veces en el mismo día, no se reinicia
+        } else {
+            this.meditationStreak = 1; // Primera vez
         }
     }
+
 
     public void hug() {
         this.health = Math.min(100, this.health + 20);
