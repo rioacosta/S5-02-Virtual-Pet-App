@@ -6,6 +6,7 @@ import S5_02_Virtual_Pet_App.dto.MeditationRequestDTO;
 import S5_02_Virtual_Pet_App.dto.PetDTO;
 import S5_02_Virtual_Pet_App.model.VirtualPet;
 import S5_02_Virtual_Pet_App.service.PetService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +16,11 @@ import java.util.List;
 @RequestMapping("/api/pets")
 public class PetController {
 
-    @Autowired
-    private PetService petService;
+    private final PetService petService;
+
+    public PetController(PetService petService) {
+        this.petService = petService;
+    }
 
     // Obtener todas las mascotas
     @GetMapping
@@ -38,7 +42,7 @@ public class PetController {
 
     // Crear nueva mascota
     @PostMapping
-    public PetDTO createPet(@RequestBody CreateVirtualPetRequestDTO request) {
+    public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request) {
         PetDTO dto = new PetDTO();
         dto.setName(request.getName());
         dto.setAvatar(request.getAvatar());
