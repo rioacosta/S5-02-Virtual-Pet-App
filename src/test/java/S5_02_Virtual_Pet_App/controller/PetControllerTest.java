@@ -1,7 +1,7 @@
 package S5_02_Virtual_Pet_App.controller;
 
-import S5_02_Virtual_Pet_App.dto.CreateVirtualPetRequestDTO;
-import S5_02_Virtual_Pet_App.dto.MeditationRequestDTO;
+import S5_02_Virtual_Pet_App.dto.petActions.CreateVirtualPetRequestDTO;
+import S5_02_Virtual_Pet_App.dto.petActions.MeditationRequestDTO;
 import S5_02_Virtual_Pet_App.dto.PetDTO;
 import S5_02_Virtual_Pet_App.service.PetService;
 import com.fasterxml.jackson.databind.ObjectMapper;

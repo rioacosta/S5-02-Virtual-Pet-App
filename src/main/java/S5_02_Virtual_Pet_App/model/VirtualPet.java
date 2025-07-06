@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,9 +30,12 @@ public class VirtualPet {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String habitat; // 🌄 Imagen de fondo
+    private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
+    private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial
+
     @DBRef
     private User owner;
-
 
     public VirtualPet() {
         this.createdAt = LocalDateTime.now();
@@ -50,23 +55,17 @@ public class VirtualPet {
         this.owner = owner;
     }
 
-    // Business methods
-    public void meditate(int minutes) {
+    public void meditate(int minutes, String reward) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterday = now.minusDays(1);
-
-        // Guardamos el día anterior de meditación, si existía
         LocalDateTime previousMeditation = this.lastMeditation;
 
-        // Actualizamos métricas base
         this.totalMeditationMinutes += minutes;
         this.experience += minutes * 2;
-        this.happiness = Math.min(100, this.happiness + (minutes / 2)); // gana felicidad proporcional
-
+        this.happiness = Math.min(100, this.happiness + (minutes / 2));
         this.lastMeditation = now;
         this.updatedAt = now;
 
-        // Nivel arriba si alcanza la experiencia requerida
         int requiredExp = level * 100;
         while (this.experience >= requiredExp) {
             this.level++;
@@ -74,18 +73,22 @@ public class VirtualPet {
             requiredExp = this.level * 100;
         }
 
-        // Lógica de racha de meditación
         if (previousMeditation != null) {
             if (previousMeditation.toLocalDate().equals(yesterday.toLocalDate())) {
                 this.meditationStreak++;
             } else if (!previousMeditation.toLocalDate().equals(now.toLocalDate())) {
                 this.meditationStreak = 1;
-            } // Si medita dos veces en el mismo día, no se reinicia
+            }
         } else {
-            this.meditationStreak = 1; // Primera vez
+            this.meditationStreak = 1;
         }
-    }
 
+        if (reward != null) {
+            this.rewards.add(reward);
+        }
+
+        this.sessionHistory.add(new MeditationSession(now, minutes, reward));
+    }
 
     public void hug() {
         this.health = Math.min(100, this.health + 20);

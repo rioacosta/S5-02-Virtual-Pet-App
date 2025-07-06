@@ -1,4 +1,4 @@
-package S5_02_Virtual_Pet_App.dto;
+package S5_02_Virtual_Pet_App.dto.registerAndLogin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

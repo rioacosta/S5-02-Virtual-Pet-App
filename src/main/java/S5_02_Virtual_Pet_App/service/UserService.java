@@ -1,8 +1,7 @@
 package S5_02_Virtual_Pet_App.service;
 
-import S5_02_Virtual_Pet_App.dto.RegisterUserRequestDTO;
+import S5_02_Virtual_Pet_App.dto.registerAndLogin.RegisterUserRequestDTO;
 import S5_02_Virtual_Pet_App.dto.UserDTO;
-import S5_02_Virtual_Pet_App.dto.UserResponseDTO;
 import S5_02_Virtual_Pet_App.model.Role;
 import S5_02_Virtual_Pet_App.model.User;
 import S5_02_Virtual_Pet_App.repository.UserRepository;
@@ -58,7 +57,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🟢 Crear administrador
-    public UserResponseDTO createAdmin(RegisterUserRequestDTO request) {
+    public UserDTO createAdmin(RegisterUserRequestDTO request) {
         User user = new User(
                 request.getUsername(),
                 request.getEmail(),
@@ -138,15 +137,17 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    // 📦 Convertir entidad a DTO de respuesta
-    private UserResponseDTO toDTO(User user) {
-        UserResponseDTO dto = new UserResponseDTO();
+    // 📦 Convertir entidad a UserDTO
+    private UserDTO toDTO(User user) {
+        UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
+        dto.setRoles(user.getRoles());
+        dto.setEnabled(user.isEnabled());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastLogin(user.getLastLogin());
-        dto.setRoles(user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
         return dto;
     }
+
 }

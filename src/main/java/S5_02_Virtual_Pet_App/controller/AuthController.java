@@ -1,7 +1,7 @@
 package S5_02_Virtual_Pet_App.controller;
 
-import S5_02_Virtual_Pet_App.dto.LoginRequestDTO;
-import S5_02_Virtual_Pet_App.dto.LoginResponseDTO;
+import S5_02_Virtual_Pet_App.dto.registerAndLogin.LoginRequestDTO;
+import S5_02_Virtual_Pet_App.dto.registerAndLogin.LoginResponseDTO;
 import S5_02_Virtual_Pet_App.model.User;
 import S5_02_Virtual_Pet_App.security.JwtUtil;
 import S5_02_Virtual_Pet_App.service.UserService;

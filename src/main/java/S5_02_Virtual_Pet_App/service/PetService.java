@@ -73,14 +73,31 @@ public class PetService {
         }
         virtualPetRepository.deleteById(id);
     }
+
     public PetDTO meditate(String petId, int minutes) {
+        if (minutes != 5 && minutes != 10 && minutes != 15 && minutes != 20) {
+            throw new IllegalArgumentException("Duración de meditación inválida. Solo se permiten 5, 10, 15 o 20 minutos.");
+        }
+
         VirtualPet pet = virtualPetRepository.findById(petId)
                 .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
 
-        pet.meditate(minutes);
+        String reward = assignReward(minutes);
+        pet.meditate(minutes, reward);
 
         return toDTO(virtualPetRepository.save(pet));
     }
+
+    public String assignReward(int minutes) {
+        return switch (minutes) {
+            case 5 -> "flower";
+            case 10 -> "hat";
+            case 15 -> "scarf";
+            case 20 -> "glow";
+            default -> null;
+        };
+    }
+
 
     public PetDTO toDTO(VirtualPet pet) {
         PetDTO dto = new PetDTO();

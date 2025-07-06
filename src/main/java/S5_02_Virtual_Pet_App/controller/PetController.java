@@ -1,13 +1,15 @@
 package S5_02_Virtual_Pet_App.controller;
 
-import S5_02_Virtual_Pet_App.dto.CreateVirtualPetRequestDTO;
-import S5_02_Virtual_Pet_App.dto.HugRequestDTO;
-import S5_02_Virtual_Pet_App.dto.MeditationRequestDTO;
+import S5_02_Virtual_Pet_App.dto.habitat.ChangeHabitatRequestDTO;
+import S5_02_Virtual_Pet_App.dto.petActions.CreateVirtualPetRequestDTO;
+import S5_02_Virtual_Pet_App.dto.petActions.HugRequestDTO;
+import S5_02_Virtual_Pet_App.dto.petActions.MeditationRequestDTO;
 import S5_02_Virtual_Pet_App.dto.PetDTO;
+import S5_02_Virtual_Pet_App.model.MeditationSession;
 import S5_02_Virtual_Pet_App.model.VirtualPet;
 import S5_02_Virtual_Pet_App.service.PetService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,16 +66,43 @@ public class PetController {
 
     // Meditar
     @PostMapping("/{id}/meditate")
-    public PetDTO meditate(@PathVariable String id, @RequestBody MeditationRequestDTO request) {
+    public PetDTO meditate(@PathVariable String id, @Valid @RequestBody MeditationRequestDTO request) {
         return petService.meditate(id, request.getMinutes());
     }
 
     // Abrazar
     @PostMapping("/{id}/hug")
     public PetDTO hug(@PathVariable String id, @RequestBody(required = false) HugRequestDTO request) {
-        PetDTO pet = petService.getPetById(id);
-        VirtualPet petEntity = petService.getPetEntityById(id); // Este método aún no existe, lo vemos abajo
+        VirtualPet petEntity = petService.getPetEntityById(id);
         petEntity.hug();
         return petService.updatePet(id, petService.toDTO(petEntity));
+    }
+
+    // 🌄 Cambiar hábitat
+    @PutMapping("/{id}/habitat")
+    public ResponseEntity<?> changeHabitat(@PathVariable String id, @RequestBody ChangeHabitatRequestDTO request) {
+        VirtualPet pet = petService.getPetEntityById(id);
+        pet.setHabitat(request.getHabitat());
+        pet.setUpdatedAt(java.time.LocalDateTime.now());
+        petService.updatePet(id, petService.toDTO(pet));
+        return ResponseEntity.ok().build();
+    }
+
+    // 🎁 Ver recompensas obtenidas
+    @GetMapping("/{id}/rewards")
+    public List<String> getRewards(@PathVariable String id) {
+        return petService.getPetEntityById(id).getRewards();
+    }
+
+    // 📜 Ver historial de sesiones
+    @GetMapping("/{id}/history")
+    public List<MeditationSession> getMeditationHistory(@PathVariable String id) {
+        return petService.getPetEntityById(id).getSessionHistory();
+    }
+
+    // 📊 Ver estado completo de la mascota
+    @GetMapping("/{id}/status")
+    public VirtualPet getFullStatus(@PathVariable String id) {
+        return petService.getPetEntityById(id);
     }
 }
