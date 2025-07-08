@@ -27,5 +27,7 @@ public class DataInitializer {
                 System.out.println("✅ Usuario admin creado: admin / admin123");
             }
         };
+
     }
+
 }

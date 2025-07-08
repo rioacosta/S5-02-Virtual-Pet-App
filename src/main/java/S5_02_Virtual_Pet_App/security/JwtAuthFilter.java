@@ -39,13 +39,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
-            username = jwtUtil.extractUsername(jwtToken);
             try {
                 username = jwtUtil.extractUsername(jwtToken);
             } catch (Exception e) {
-                logger.error("Unable to get JWT Token: {}");
+                log.error("Unable to get JWT Token: {}", e.getMessage());
             }
         }
+
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userService.loadUserByUsername(username);

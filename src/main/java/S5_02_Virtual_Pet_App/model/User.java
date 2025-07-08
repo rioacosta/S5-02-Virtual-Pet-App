@@ -40,7 +40,6 @@ public class User implements UserDetails {
     @DBRef
     private List<VirtualPet> pets = new ArrayList<>();
 
-
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -63,7 +62,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .toList();
     }
 
