@@ -37,7 +37,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🟢 Crear usuario normal
-    public User createUser(@Valid UserDTO request) {
+    public User registerNewUser(@Valid UserDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }

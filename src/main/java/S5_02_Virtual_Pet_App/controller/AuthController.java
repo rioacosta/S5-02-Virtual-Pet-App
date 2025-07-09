@@ -33,7 +33,6 @@ public class AuthController {
                             request.getPassword()
                     )
             );
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
 

@@ -1,6 +1,8 @@
 package S5_02_Virtual_Pet_App.controller;
 
 import S5_02_Virtual_Pet_App.dto.UserDTO;
+import S5_02_Virtual_Pet_App.dto.registerAndLogin.RegisterUserRequestDTO;
+import S5_02_Virtual_Pet_App.model.Role;
 import S5_02_Virtual_Pet_App.model.User;
 import S5_02_Virtual_Pet_App.service.UserService;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,12 +27,24 @@ public class UserController {
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterUserRequestDTO request) {
+        UserDTO dto = new UserDTO();
+        dto.setUsername(request.getUsername());
+        dto.setEmail(request.getEmail());
+        dto.setPassword(request.getPassword());
+        dto.setRoles(Set.of(Role.USER)); // ← asigna rol USER por defecto
+
+        User created = userService.registerNewUser(dto);
+        return ResponseEntity.ok(UserDTO.fromEntity(created));
+    }
+
 
     // 🔵 Crear nuevo usuario (admin)
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
-        User created = userService.createUser(userDTO);
+        User created = userService.registerNewUser(userDTO);
         return ResponseEntity.ok(UserDTO.fromEntity(created));
     }
 
