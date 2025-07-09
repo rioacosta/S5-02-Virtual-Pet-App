@@ -3,9 +3,11 @@ package S5_02_Virtual_Pet_App.dto.registerAndLogin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class RegisterUserRequestDTO {
     @NotBlank(message = "El nombre de usuario es obligatorio")
     @Size(min = 3, max = 20)

@@ -27,6 +27,8 @@ public class UserController {
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
+
+    // 🟢 Autoregistro de usuario
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterUserRequestDTO request) {
         UserDTO dto = new UserDTO();
@@ -39,6 +41,26 @@ public class UserController {
         return ResponseEntity.ok(UserDTO.fromEntity(created));
     }
 
+    // 🟠 Actualizar datos del usuario autenticado
+    @PutMapping("/update")
+    public ResponseEntity<UserDTO> updateProfile(
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody UserDTO userDTO
+    ) {
+        User updated = userService.updateUser(currentUser.getUsername(), userDTO);
+        return ResponseEntity.ok(UserDTO.fromEntity(updated));
+    }
+
+    // 🟠 Cambiar contraseña del usuario autenticado
+    @PatchMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal User user,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword
+    ) {
+        userService.changePassword(user.getUsername(), oldPassword, newPassword);
+        return ResponseEntity.noContent().build();
+    }
 
     // 🔵 Crear nuevo usuario (admin)
     @PreAuthorize("hasRole('ADMIN')")
@@ -64,26 +86,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // 🟠 Actualizar datos del usuario autenticado
-    @PutMapping("/update")
-    public ResponseEntity<UserDTO> updateProfile(
-            @AuthenticationPrincipal User currentUser,
-            @Valid @RequestBody UserDTO userDTO
-    ) {
-        User updated = userService.updateUser(currentUser.getUsername(), userDTO);
-        return ResponseEntity.ok(UserDTO.fromEntity(updated));
-    }
-
-    // 🟠 Cambiar contraseña del usuario autenticado
-    @PatchMapping("/change-password")
-    public ResponseEntity<Void> changePassword(
-            @AuthenticationPrincipal User user,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword
-    ) {
-        userService.changePassword(user.getUsername(), oldPassword, newPassword);
-        return ResponseEntity.noContent().build();
-    }
 
     // 🔴 Bloquear o desbloquear usuario (admin)
     @PreAuthorize("hasRole('ADMIN')")

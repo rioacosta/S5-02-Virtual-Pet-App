@@ -1,18 +1,18 @@
 package S5_02_Virtual_Pet_App.controller;
 
+import S5_02_Virtual_Pet_App.config.TestSecurityConfig;
+import S5_02_Virtual_Pet_App.dto.PetDTO;
 import S5_02_Virtual_Pet_App.dto.petActions.CreateVirtualPetRequestDTO;
 import S5_02_Virtual_Pet_App.dto.petActions.MeditationRequestDTO;
-import S5_02_Virtual_Pet_App.dto.PetDTO;
+import S5_02_Virtual_Pet_App.security.JwtAuthFilter;
+import S5_02_Virtual_Pet_App.security.JwtUtil;
 import S5_02_Virtual_Pet_App.service.PetService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,27 +22,28 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = PetController.class, excludeAutoConfiguration = {
-        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class
-})
+@WebMvcTest(PetController.class)
+@Import(TestSecurityConfig.class)
 public class PetControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean // ← usar esto en lugar de TestConfig
+    @MockBean
     private PetService petService;
+
+    @MockBean
+    private JwtAuthFilter jwtAuthFilter;
+
+    @MockBean
+    private JwtUtil jwtUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Test
-    void contextLoads() {
-        // No hace nada, solo verifica que el contexto se carga
-    }
 
     private PetDTO samplePet() {
         PetDTO pet = new PetDTO();
@@ -53,10 +54,34 @@ public class PetControllerTest {
         pet.setCreatedAt(LocalDateTime.now());
         pet.setUpdatedAt(LocalDateTime.now());
         pet.setLevel(1);
-        pet.setExperience(0);
-        pet.setHappiness(50);
+        pet.setExperience(42);
+        pet.setHappiness(80);
         pet.setHealth(100);
         return pet;
+    }
+
+    @Test
+    void testCreatePet() throws Exception {
+        CreateVirtualPetRequestDTO request = new CreateVirtualPetRequestDTO();
+        request.setName("Neko");
+        request.setAvatar("cat.png");
+        request.setOwnerId("owner123");
+
+        Mockito.when(petService.createPet(any())).thenReturn(samplePet());
+
+        mockMvc.perform(post("/api/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Neko"));
+    }
+
+    @Test
+    void testDeletePet() throws Exception {
+        mockMvc.perform(delete("/api/pets/123"))
+                .andExpect(status().isOk());
+
+        verify(petService).deletePet("123");
     }
 
     @Test
@@ -69,19 +94,10 @@ public class PetControllerTest {
     }
 
     @Test
-    void testCreatePet() throws Exception {
-        CreateVirtualPetRequestDTO request = new CreateVirtualPetRequestDTO();
-        request.setName("Neko");
-        request.setAvatar("cat.png");
-        request.setOwnerId("owner123");
+    void testGetPetById() throws Exception {
+        Mockito.when(petService.getPetById("123")).thenReturn(samplePet());
 
-        PetDTO response = samplePet();
-
-        Mockito.when(petService.createPet(any())).thenReturn(response);
-
-        mockMvc.perform(post("/api/pets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(get("/api/pets/123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Neko"));
     }
@@ -92,8 +108,8 @@ public class PetControllerTest {
         request.setMinutes(10);
 
         PetDTO updatedPet = samplePet();
-        updatedPet.setExperience(20);
-        updatedPet.setHappiness(55);
+        updatedPet.setExperience(100);
+        updatedPet.setHappiness(90);
 
         Mockito.when(petService.meditate(eq("123"), eq(10))).thenReturn(updatedPet);
 
@@ -101,26 +117,7 @@ public class PetControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.experience").value(20))
-                .andExpect(jsonPath("$.happiness").value(55));
-    }
-
-    @Test
-    void testGetPetById() throws Exception {
-        PetDTO pet = samplePet();
-
-        Mockito.when(petService.getPetById("123")).thenReturn(pet);
-
-        mockMvc.perform(get("/api/pets/123"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Neko"));
-    }
-
-    @Test
-    void testDeletePet() throws Exception {
-        mockMvc.perform(delete("/api/pets/123"))
-                .andExpect(status().isOk());
-
-        Mockito.verify(petService).deletePet("123");
+                .andExpect(jsonPath("$.experience").value(100))
+                .andExpect(jsonPath("$.happiness").value(90));
     }
 }

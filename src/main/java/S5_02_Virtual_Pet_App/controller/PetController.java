@@ -60,13 +60,15 @@ public class PetController {
 
     // Eliminar mascota
     @DeleteMapping("/{id}")
-    public void deletePet(@PathVariable String id) {
+    public ResponseEntity<Void> deletePet(@PathVariable String id) {
         petService.deletePet(id);
+        return ResponseEntity.ok().build();
     }
 
     // Meditar
     @PostMapping("/{id}/meditate")
     public PetDTO meditate(@PathVariable String id, @Valid @RequestBody MeditationRequestDTO request) {
+        System.out.println("Meditated pet: " + petService.meditate(id, request.getMinutes()));
         return petService.meditate(id, request.getMinutes());
     }
 
