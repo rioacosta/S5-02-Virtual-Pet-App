@@ -3,11 +3,11 @@ package S502VirtualPetApp;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(properties = "spring.profiles.active=test")
-class S502VirtualPetAppApplicationTests {
+@SpringBootTest
+public class S502VirtualPetAppApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
-
+	@Test
+	public void contextLoads() {
+		System.out.println("Test ejecutado correctamente!");
+	}
 }
