@@ -114,6 +114,9 @@ public class PetService {
         dto.setLastMeditation(pet.getLastMeditation());
         dto.setCreatedAt(pet.getCreatedAt());
         dto.setUpdatedAt(pet.getUpdatedAt());
+        dto.setHabitat(pet.getHabitat());
+        dto.setRewards(pet.getRewards());
+        dto.setSessionHistory(pet.getSessionHistory());
         dto.setOwnerId(pet.getOwner() != null ? pet.getOwner().getId() : null);
         return dto;
     }
