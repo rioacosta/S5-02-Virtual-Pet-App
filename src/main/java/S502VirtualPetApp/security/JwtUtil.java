@@ -15,6 +15,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -36,8 +37,8 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String extractRole(String token){
-        return extractClaim(token, claims -> claims.get("role").toString());
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> (List<String>) claims.get("roles"));
     }
 
     public Date extractExpiration(String token) {
@@ -63,14 +64,18 @@ public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(authority -> authority.getAuthority())
+                .toList();
+
+        claims.put("roles", roles);  // 🌈 Añade el claim correcto
+
         return createToken(claims, userDetails.getUsername());
     }
 
-    public String generateToken(String username, String role) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
-        return createToken(claims, username);
-    }
+
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()

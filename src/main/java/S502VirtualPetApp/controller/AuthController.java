@@ -36,12 +36,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
 
-            String primaryRole = user.getRoles().stream()
-                    .map(Enum::name)
-                    .findFirst()
-                    .orElse("USER");
-
-            String token = jwtUtil.generateToken(user.getUsername(), "ROLE_" + primaryRole);
+            String token = jwtUtil.generateToken(user);
             userService.updateLastLogin(user.getUsername());
 
             return ResponseEntity.ok(new LoginResponseDTO(token, user.getUsername(), user.getEmail()));
@@ -54,7 +49,6 @@ public class AuthController {
                     .body(Map.of("error", "Authentication failed", "details", e.getMessage()));
         }
     }
-
 
     @GetMapping("/debug")
     public ResponseEntity<?> debug() {

@@ -94,10 +94,4 @@ public class PetController {
         return petService.getFullStatus(id, user);
     }
 
-    @GetMapping("/debug-create")
-    public PetDTO debugCreate(@AuthenticationPrincipal User user) {
-        VirtualPet pet = new VirtualPet("Zentoro", "/assets/Zentoro.png", user);
-        return petService.toDTO(virtualPetRepository.save(pet));
-    }
-
 }
