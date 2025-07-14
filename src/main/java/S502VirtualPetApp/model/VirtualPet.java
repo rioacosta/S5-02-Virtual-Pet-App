@@ -16,7 +16,6 @@ import java.util.List;
 public class VirtualPet {
     @Id
     private String id;
-
     private String name;
     private String avatar;
     private int level;

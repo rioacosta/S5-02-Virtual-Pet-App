@@ -12,7 +12,4 @@ public class CreateVirtualPetRequestDTO {
 
     @NotBlank(message = "El avatar no puede estar vacío")
     private String avatar;
-
-    @NotBlank(message = "El ID del dueño no puede estar vacío")
-    private String ownerId;
 }

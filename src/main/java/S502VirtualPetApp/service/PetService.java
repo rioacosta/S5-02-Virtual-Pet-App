@@ -1,6 +1,8 @@
 package S502VirtualPetApp.service;
 
 import S502VirtualPetApp.dto.PetDTO;
+import S502VirtualPetApp.dto.petActions.CreateVirtualPetRequestDTO;
+import S502VirtualPetApp.model.MeditationSession;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualPet;
 import S502VirtualPetApp.repository.UserRepository;
@@ -21,71 +23,88 @@ public class PetService {
     @Autowired
     private UserRepository userRepository;
 
-    public VirtualPet getPetEntityById(String petId) {
-        return virtualPetRepository.findById(petId)
-                .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
-    }
-
-    public List<PetDTO> getAllPets() {
-        return virtualPetRepository.findAll().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<PetDTO> getPetsByOwner(String ownerId) {
-        User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new RuntimeException("Owner not found"));
-
+    public List<PetDTO> getPetsByOwner(User owner) {
         return virtualPetRepository.findByOwner(owner).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public PetDTO getPetById(String petId) {
-        return virtualPetRepository.findById(petId)
-                .map(this::toDTO)
-                .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
+    public PetDTO getPetByIdOwned(String petId, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+        return toDTO(pet);
     }
 
-    public PetDTO createPet(PetDTO dto) {
-        User owner = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("Owner not found"));
+    public VirtualPet getPetEntityById(String petId, User owner) {
+        return getAndValidateOwnership(petId, owner);
+    }
 
-        VirtualPet pet = new VirtualPet(dto.getName(), dto.getAvatar(), owner);
+    private VirtualPet getAndValidateOwnership(String petId, User owner) {
+        VirtualPet pet = virtualPetRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
+        if (!pet.getOwner().getId().equals(owner.getId())) {
+            throw new RuntimeException("Unauthorized access to pet");
+        }
+        return pet;
+    }
+
+    public PetDTO createPet(CreateVirtualPetRequestDTO request, User owner) {
+        VirtualPet pet = new VirtualPet(request.getName(), request.getAvatar(), owner);
         VirtualPet saved = virtualPetRepository.save(pet);
         return toDTO(saved);
     }
 
-    public PetDTO updatePet(String id, PetDTO dto) {
-        VirtualPet existing = virtualPetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
+    public PetDTO updatePet(String petId, PetDTO dto, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
 
-        existing.setName(dto.getName());
-        existing.setAvatar(dto.getAvatar());
-        existing.setUpdatedAt(java.time.LocalDateTime.now());
+        pet.setName(dto.getName());
+        pet.setAvatar(dto.getAvatar());
+        pet.setUpdatedAt(java.time.LocalDateTime.now());
 
-        return toDTO(virtualPetRepository.save(existing));
+        return toDTO(virtualPetRepository.save(pet));
     }
 
-    public void deletePet(String id) {
-        if (!virtualPetRepository.existsById(id)) {
-            throw new RuntimeException("Virtual Pet not found");
-        }
-        virtualPetRepository.deleteById(id);
+    public void deletePet(String petId, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+        virtualPetRepository.delete(pet);
     }
 
-    public PetDTO meditate(String petId, int minutes) {
+    public PetDTO meditate(String petId, int minutes, User owner) {
         if (minutes != 5 && minutes != 10 && minutes != 15 && minutes != 20) {
-            throw new IllegalArgumentException("Duración de meditación inválida. Solo se permiten 5, 10, 15 o 20 minutos.");
+            throw new IllegalArgumentException("Duración inválida");
         }
 
-        VirtualPet pet = virtualPetRepository.findById(petId)
-                .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
-
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
         String reward = assignReward(minutes);
         pet.meditate(minutes, reward);
 
         return toDTO(virtualPetRepository.save(pet));
+    }
+
+    public PetDTO hug(String petId, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+        pet.hug();
+        return toDTO(virtualPetRepository.save(pet));
+    }
+
+    public PetDTO changeHabitat(String petId, String habitat, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+        pet.setHabitat(habitat);
+        pet.setUpdatedAt(java.time.LocalDateTime.now());
+        return toDTO(virtualPetRepository.save(pet));
+    }
+
+    public List<String> getRewards(String petId, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+        return pet.getRewards();
+    }
+
+    public List<MeditationSession> getMeditationHistory(String petId, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+        return pet.getSessionHistory();
+    }
+
+    public PetDTO getFullStatus(String petId, User owner) {
+        return toDTO(getAndValidateOwnership(petId, owner));
     }
 
     public String assignReward(int minutes) {
@@ -97,7 +116,6 @@ public class PetService {
             default -> null;
         };
     }
-
 
     public PetDTO toDTO(VirtualPet pet) {
         PetDTO dto = new PetDTO();

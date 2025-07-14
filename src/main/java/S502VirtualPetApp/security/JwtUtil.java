@@ -85,6 +85,9 @@ public class JwtUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         try {
             final String username = extractUsername(token);
+            logger.info("JWT token validation - waiting: {}, extracted: {}", userDetails.getUsername(), username);
+            logger.info("¿Token expirado?: {}", isTokenExpired(token));
+
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
         } catch (JwtException e) {
             logger.error("JWT token validation failed: {}", e.getMessage());

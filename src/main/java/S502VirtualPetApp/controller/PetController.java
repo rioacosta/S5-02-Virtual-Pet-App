@@ -6,10 +6,14 @@ import S502VirtualPetApp.dto.petActions.HugRequestDTO;
 import S502VirtualPetApp.dto.petActions.MeditationRequestDTO;
 import S502VirtualPetApp.dto.PetDTO;
 import S502VirtualPetApp.model.MeditationSession;
+import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualPet;
+import S502VirtualPetApp.repository.VirtualPetRepository;
 import S502VirtualPetApp.service.PetService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,94 +21,83 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/pets")
 public class PetController {
-
+    VirtualPetRepository virtualPetRepository;
     private final PetService petService;
 
     public PetController(PetService petService) {
         this.petService = petService;
     }
 
-    // Obtener todas las mascotas
     @GetMapping
-    public List<PetDTO> getAllPets() {
-        return petService.getAllPets();
+    public List<PetDTO> getMyPets(@AuthenticationPrincipal User user) {
+        return petService.getPetsByOwner(user);
     }
 
-    // Obtener mascotas por ID de dueño
-    @GetMapping("/owner/{ownerId}")
-    public List<PetDTO> getPetsByOwner(@PathVariable String ownerId) {
-        return petService.getPetsByOwner(ownerId);
-    }
-
-    // Obtener mascota por su ID
     @GetMapping("/{id}")
-    public PetDTO getPetById(@PathVariable String id) {
-        return petService.getPetById(id);
+    public PetDTO getMyPet(@PathVariable String id, @AuthenticationPrincipal User user) {
+        return petService.getPetByIdOwned(id, user);
     }
 
-    // Crear nueva mascota
     @PostMapping
-    public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request) {
-        PetDTO dto = new PetDTO();
-        dto.setName(request.getName());
-        dto.setAvatar(request.getAvatar());
-        dto.setOwnerId(request.getOwnerId());
-        return petService.createPet(dto);
+    public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request,
+                            @AuthenticationPrincipal User user) {
+        return petService.createPet(request, user);
     }
 
-    // Actualizar mascota
     @PutMapping("/{id}")
-    public PetDTO updatePet(@PathVariable String id, @RequestBody PetDTO dto) {
-        return petService.updatePet(id, dto);
+    public PetDTO updatePet(@PathVariable String id, @RequestBody PetDTO dto,
+                            @AuthenticationPrincipal User user) {
+        return petService.updatePet(id, dto, user);
     }
 
-    // Eliminar mascota
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePet(@PathVariable String id) {
-        petService.deletePet(id);
+    public ResponseEntity<Void> deletePet(@PathVariable String id, @AuthenticationPrincipal User user) {
+        petService.deletePet(id, user);
         return ResponseEntity.ok().build();
     }
 
-    // Meditar
     @PostMapping("/{id}/meditate")
-    public PetDTO meditate(@PathVariable String id, @Valid @RequestBody MeditationRequestDTO request) {
-        System.out.println("Meditated pet: " + petService.meditate(id, request.getMinutes()));
-        return petService.meditate(id, request.getMinutes());
+    public PetDTO meditate(@PathVariable String id,
+                           @Valid @RequestBody MeditationRequestDTO request,
+                           @AuthenticationPrincipal User user) {
+        return petService.meditate(id, request.getMinutes(), user);
     }
 
-    // Abrazar
     @PostMapping("/{id}/hug")
-    public PetDTO hug(@PathVariable String id, @RequestBody(required = false) HugRequestDTO request) {
-        VirtualPet petEntity = petService.getPetEntityById(id);
-        petEntity.hug();
-        return petService.updatePet(id, petService.toDTO(petEntity));
+    public PetDTO hug(@PathVariable String id,
+                      @AuthenticationPrincipal User user) {
+        return petService.hug(id, user);
     }
 
-    // 🌄 Cambiar hábitat
     @PutMapping("/{id}/habitat")
-    public ResponseEntity<?> changeHabitat(@PathVariable String id, @RequestBody ChangeHabitatRequestDTO request) {
-        VirtualPet pet = petService.getPetEntityById(id);
-        pet.setHabitat(request.getHabitat());
-        pet.setUpdatedAt(java.time.LocalDateTime.now());
-        petService.updatePet(id, petService.toDTO(pet));
-        return ResponseEntity.ok().build();
+    public PetDTO changeHabitat(@PathVariable String id,
+                                @RequestBody ChangeHabitatRequestDTO request,
+                                @AuthenticationPrincipal User user) {
+        return petService.changeHabitat(id, request.getHabitat(), user);
     }
 
-    // 🎁 Ver recompensas obtenidas
     @GetMapping("/{id}/rewards")
-    public List<String> getRewards(@PathVariable String id) {
-        return petService.getPetEntityById(id).getRewards();
+    public List<String> getRewards(@PathVariable String id,
+                                   @AuthenticationPrincipal User user) {
+        return petService.getRewards(id, user);
     }
 
-    // 📜 Ver historial de sesiones
     @GetMapping("/{id}/history")
-    public List<MeditationSession> getMeditationHistory(@PathVariable String id) {
-        return petService.getPetEntityById(id).getSessionHistory();
+    public List<MeditationSession> getMeditationHistory(@PathVariable String id,
+                                                        @AuthenticationPrincipal User user) {
+        return petService.getMeditationHistory(id, user);
     }
 
-    // 📊 Ver estado completo de la mascota
     @GetMapping("/{id}/status")
-    public VirtualPet getFullStatus(@PathVariable String id) {
-        return petService.getPetEntityById(id);
+    public PetDTO getFullStatus(@PathVariable String id,
+                                @AuthenticationPrincipal User user) {
+        return petService.getFullStatus(id, user);
     }
+
+    @GetMapping("/debug-create")
+    public PetDTO debugCreate(@AuthenticationPrincipal User user) {
+        VirtualPet pet = new VirtualPet("Zentoro", "/assets/Zentoro.png", user);
+        return petService.toDTO(virtualPetRepository.save(pet));
+    }
+
 }
