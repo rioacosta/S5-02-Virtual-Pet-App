@@ -1,8 +1,10 @@
 package S502VirtualPetApp.dto;
 
+import S502VirtualPetApp.model.MeditationSession;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class PetDTO {
@@ -19,5 +21,9 @@ public class PetDTO {
     private LocalDateTime lastMeditation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String habitat;
+    private List<String> rewards;
+    private List<MeditationSession> sessionHistory;
+
     private String ownerId;
 }

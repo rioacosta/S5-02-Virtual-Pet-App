@@ -24,7 +24,6 @@ import java.util.*;
 public class UserService implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -55,15 +54,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🟢 Crear administrador
-    public UserDTO createAdmin(RegisterUserRequestDTO request) {
-        User user = new User(
-                request.getUsername(),
-                request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                Set.of(Role.ADMIN, Role.USER)
-        );
-        return toDTO(userRepository.save(user));
-    }
+
 
     // 🕒 Actualizar último login
     public void updateLastLogin(String username) {

@@ -16,7 +16,6 @@ import java.util.List;
 public class VirtualPet {
     @Id
     private String id;
-
     private String name;
     private String avatar;
     private int level;
@@ -29,7 +28,6 @@ public class VirtualPet {
     private LocalDateTime lastMeditation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     private String habitat; // 🌄 Imagen de fondo
     private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
     private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial

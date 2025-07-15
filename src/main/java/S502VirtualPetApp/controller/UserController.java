@@ -1,9 +1,12 @@
 package S502VirtualPetApp.controller;
 
+import S502VirtualPetApp.dto.PetDTO;
 import S502VirtualPetApp.dto.UserDTO;
+import S502VirtualPetApp.dto.admin.AdminUserWithPetsDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
+import S502VirtualPetApp.service.PetService;
 import S502VirtualPetApp.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +25,7 @@ import java.util.Set;
 public class UserController {
 
     private final UserService userService;
+    private final PetService petService;
 
     // 🟢 Obtener el usuario autenticado
     @GetMapping("/me")
@@ -77,6 +82,22 @@ public class UserController {
         List<User> users = userService.findAll();
         return ResponseEntity.ok(users.stream().map(UserDTO::fromEntity).toList());
     }
+
+    // Listar todos los usuarios con sus mascotas
+    @GetMapping("/admin/users-with-pets")
+    public List<AdminUserWithPetsDTO> getAllUsersWithPets() {
+        List<User> users = userService.findAll();
+        List<AdminUserWithPetsDTO> result = new ArrayList<>();
+
+        for (User user : users) {
+            List<PetDTO> pets = petService.getPetsByOwner(user); // ⬅️ Usas tu método existente
+            result.add(AdminUserWithPetsDTO.fromEntity(user, pets));
+        }
+
+        return result;
+    }
+
+
 
     // 🔴 Eliminar usuario por username (admin)
     @PreAuthorize("hasRole('ADMIN')")
