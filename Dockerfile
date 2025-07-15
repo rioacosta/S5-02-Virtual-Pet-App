@@ -5,10 +5,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN apk add --no-cache libc6-compat && \
-    echo "export LANG=en_US.UTF-8" >> /etc/profile
-ENV LANG en_US.UTF-8
-
 RUN ./mvnw package -DskipTests
 
 EXPOSE 8080
