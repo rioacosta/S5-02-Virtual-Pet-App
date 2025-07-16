@@ -10,4 +10,5 @@ public class S502VirtualPetAppApplication {
 		SpringApplication.run(S502VirtualPetAppApplication.class, args);
 	}
 
+//	http://localhost:8080/swagger-ui/index.html#
 }

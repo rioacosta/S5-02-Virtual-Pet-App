@@ -24,6 +24,5 @@ public class PetDTO {
     private String habitat;
     private List<String> rewards;
     private List<MeditationSession> sessionHistory;
-
     private String ownerId;
 }

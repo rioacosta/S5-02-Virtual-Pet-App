@@ -117,6 +117,19 @@ public class PetService {
         };
     }
 
+    public PetDTO addReward(String petId, String rewardName, User owner) {
+        VirtualPet pet = getAndValidateOwnership(petId, owner);
+
+        if (!pet.getRewards().contains(rewardName)) {
+            pet.getRewards().add(rewardName);
+            pet.setUpdatedAt(java.time.LocalDateTime.now());
+            virtualPetRepository.save(pet);
+        }
+
+        return toDTO(pet);
+    }
+
+
     public PetDTO toDTO(VirtualPet pet) {
         PetDTO dto = new PetDTO();
         dto.setId(pet.getId());
