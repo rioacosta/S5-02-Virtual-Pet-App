@@ -14,7 +14,6 @@ public class PetDTO {
     private int level;
     private int experience;
     private int happiness;
-    private int health;
     private int meditationStreak;
     private int totalMeditationMinutes;
     private LocalDateTime lastHug;
@@ -24,5 +23,6 @@ public class PetDTO {
     private String habitat;
     private List<String> rewards;
     private List<MeditationSession> sessionHistory;
+    private List<String> avatarStages;
     private String ownerId;
 }

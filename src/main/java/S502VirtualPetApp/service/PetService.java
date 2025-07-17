@@ -10,6 +10,7 @@ import S502VirtualPetApp.repository.VirtualPetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -48,10 +49,15 @@ public class PetService {
     }
 
     public PetDTO createPet(CreateVirtualPetRequestDTO request, User owner) {
-        VirtualPet pet = new VirtualPet(request.getName(), request.getAvatar(), owner);
+        String avatar = request.getAvatar();
+        if (avatar != null) {
+            avatar = avatar.substring(avatar.lastIndexOf('/') + 1); // Extrae solo el nombre del archivo
+        }
+        VirtualPet pet = new VirtualPet(request.getName(), avatar, owner);
         VirtualPet saved = virtualPetRepository.save(pet);
         return toDTO(saved);
     }
+
 
     public PetDTO updatePet(String petId, PetDTO dto, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
@@ -130,7 +136,7 @@ public class PetService {
     }
 
 
-    public PetDTO toDTO(VirtualPet pet) {
+    private PetDTO toDTO(VirtualPet pet) {
         PetDTO dto = new PetDTO();
         dto.setId(pet.getId());
         dto.setName(pet.getName());
@@ -138,7 +144,6 @@ public class PetService {
         dto.setLevel(pet.getLevel());
         dto.setExperience(pet.getExperience());
         dto.setHappiness(pet.getHappiness());
-        dto.setHealth(pet.getHealth());
         dto.setMeditationStreak(pet.getMeditationStreak());
         dto.setTotalMeditationMinutes(pet.getTotalMeditationMinutes());
         dto.setLastHug(pet.getLastHug());
@@ -149,6 +154,23 @@ public class PetService {
         dto.setRewards(pet.getRewards());
         dto.setSessionHistory(pet.getSessionHistory());
         dto.setOwnerId(pet.getOwner() != null ? pet.getOwner().getId() : null);
+
+        // Construir avatarStages basados en el avatar del sistema
+        List<String> avatarStages = new ArrayList<>();
+        int stagesCount = 3; // o el número de etapas que tengas
+        String baseAvatar = pet.getAvatar();
+
+        // Asegurarse de que obtenemos solo el nombre base sin extensión:
+        if (baseAvatar != null && baseAvatar.endsWith(".png")) {
+            baseAvatar = baseAvatar.substring(0, baseAvatar.length() - 4); // quita ".png"
+        }
+        for (int i = 1; i <= stagesCount; i++) {
+            // Construye la ruta usando el directorio público y el nombre base correcto
+            avatarStages.add("/assets/avatars/" + baseAvatar + "_stage" + i + ".png");
+        }
+        dto.setAvatarStages(avatarStages);
+
         return dto;
     }
+
 }
