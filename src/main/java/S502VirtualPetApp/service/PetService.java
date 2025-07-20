@@ -157,7 +157,7 @@ public class PetService {
 
         // Construir avatarStages basados en el avatar del sistema
         List<String> avatarStages = new ArrayList<>();
-        int stagesCount = 3; // o el número de etapas que tengas
+        int stagesCount = 4; // o el número de etapas que tengas
         String baseAvatar = pet.getAvatar();
 
         // Asegurarse de que obtenemos solo el nombre base sin extensión:
