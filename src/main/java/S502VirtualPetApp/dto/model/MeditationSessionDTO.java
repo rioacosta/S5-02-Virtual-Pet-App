@@ -1,19 +1,17 @@
-package S502VirtualPetApp.model;
+package S502VirtualPetApp.dto.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MeditationSession {
+public class MeditationSessionDTO {
     private LocalDateTime date;
-    private int duration;
+    private int minutes;
     private String reward;
-    private String habitat; // ⬅️ NUEVO
+    private String habitat;
 }

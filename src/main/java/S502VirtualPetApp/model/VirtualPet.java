@@ -21,7 +21,6 @@ public class VirtualPet {
     private int level;
     private int experience;
     private int happiness;
-    private int health;
     private int meditationStreak;
     private int totalMeditationMinutes;
     private LocalDateTime lastHug;
@@ -30,6 +29,7 @@ public class VirtualPet {
     private LocalDateTime updatedAt;
     private String habitat; // 🌄 Imagen de fondo
     private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
+    private List<String> avatarStages;
     private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial
 
     @DBRef
@@ -41,9 +41,9 @@ public class VirtualPet {
         this.level = 1;
         this.experience = 0;
         this.happiness = 50;
-        this.health = 100;
         this.meditationStreak = 0;
         this.totalMeditationMinutes = 0;
+        this.avatarStages = new ArrayList<>();
     }
 
     public VirtualPet(String name, String type, User owner) {
@@ -53,13 +53,13 @@ public class VirtualPet {
         this.owner = owner;
     }
 
-    public void meditate(int minutes, String reward) {
+    public void meditate(int minutes, String reward, String habitat) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterday = now.minusDays(1);
         LocalDateTime previousMeditation = this.lastMeditation;
 
         this.totalMeditationMinutes += minutes;
-        this.experience += minutes * 2;
+        this.experience += minutes * 10;
         this.happiness = Math.min(100, this.happiness + (minutes / 2));
         this.lastMeditation = now;
         this.updatedAt = now;
@@ -85,11 +85,10 @@ public class VirtualPet {
             this.rewards.add(reward);
         }
 
-        this.sessionHistory.add(new MeditationSession(now, minutes, reward));
+        this.sessionHistory.add(new MeditationSession(now, minutes, reward, habitat));
     }
 
     public void hug() {
-        this.health = Math.min(100, this.health + 20);
         this.happiness = Math.min(100, this.happiness + 10);
         this.lastHug = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();

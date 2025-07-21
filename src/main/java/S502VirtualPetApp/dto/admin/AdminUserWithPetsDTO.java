@@ -1,6 +1,6 @@
 package S502VirtualPetApp.dto.admin;
 
-import S502VirtualPetApp.dto.PetDTO;
+import S502VirtualPetApp.dto.model.PetDTO;
 import S502VirtualPetApp.model.User;
 import lombok.Data;
 
