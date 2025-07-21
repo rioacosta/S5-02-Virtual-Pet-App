@@ -1,5 +1,6 @@
 package S502VirtualPetApp.controller;
 
+import S502VirtualPetApp.dto.MeditationSessionDTO;
 import S502VirtualPetApp.dto.habitat.ChangeHabitatRequestDTO;
 import S502VirtualPetApp.dto.petActions.CreateVirtualPetRequestDTO;
 import S502VirtualPetApp.dto.petActions.HugRequestDTO;
@@ -85,6 +86,13 @@ public class PetController {
                                 @AuthenticationPrincipal User user) {
         return petService.changeHabitat(id, request.getHabitat(), user);
     }*/
+
+    @GetMapping("/{id}/history")
+    @Operation(summary = "Mostrar historial de sesiones de meditación")
+    public List<MeditationSessionDTO> getMeditationHistory(@PathVariable String id,
+                                                           @AuthenticationPrincipal User user) {
+        return petService.getMeditationHistoryDTO(id, user);
+    }
 
     @GetMapping("/{id}/rewards")
     @Operation(summary = "Mostrar lista de recompensas")

@@ -203,7 +203,7 @@ public class PetService {
         dto.setRewards(pet.getRewards());
         dto.setSessionHistory(
                 pet.getSessionHistory().stream()
-                        .map(session -> new MeditationSessionDTO(
+                        .map(session -> new MeditationSession(
                                 session.getDate(),
                                 session.getDuration(),
                                 session.getReward(),
