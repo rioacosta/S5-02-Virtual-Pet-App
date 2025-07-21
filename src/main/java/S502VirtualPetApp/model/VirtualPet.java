@@ -53,13 +53,13 @@ public class VirtualPet {
         this.owner = owner;
     }
 
-    public void meditate(int minutes, String reward) {
+    public void meditate(int minutes, String reward, String habitat) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterday = now.minusDays(1);
         LocalDateTime previousMeditation = this.lastMeditation;
 
         this.totalMeditationMinutes += minutes;
-        this.experience += minutes * 2;
+        this.experience += minutes * 10;
         this.happiness = Math.min(100, this.happiness + (minutes / 2));
         this.lastMeditation = now;
         this.updatedAt = now;
@@ -85,7 +85,7 @@ public class VirtualPet {
             this.rewards.add(reward);
         }
 
-        this.sessionHistory.add(new MeditationSession(now, minutes, reward));
+        this.sessionHistory.add(new MeditationSession(now, minutes, reward, habitat));
     }
 
     public void hug() {

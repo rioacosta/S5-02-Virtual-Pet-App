@@ -68,7 +68,7 @@ public class PetController {
     public PetDTO meditate(@PathVariable String id,
                            @Valid @RequestBody MeditationRequestDTO request,
                            @AuthenticationPrincipal User user) {
-        return petService.meditate(id, request.getMinutes(), user);
+        return petService.meditate(id, request.getMinutes(), request.getHabitat(), user);
     }
 
     @PostMapping("/{id}/hug")
@@ -78,26 +78,19 @@ public class PetController {
         return petService.hug(id, user);
     }
 
-    @PutMapping("/{id}/habitat")
+    /*@PutMapping("/{id}/habitat")
     @Operation(summary = "Solicitud de cambio de habitat")
     public PetDTO changeHabitat(@PathVariable String id,
                                 @RequestBody ChangeHabitatRequestDTO request,
                                 @AuthenticationPrincipal User user) {
         return petService.changeHabitat(id, request.getHabitat(), user);
-    }
+    }*/
 
     @GetMapping("/{id}/rewards")
     @Operation(summary = "Mostrar lista de recompensas")
     public List<String> getRewards(@PathVariable String id,
                                    @AuthenticationPrincipal User user) {
         return petService.getRewards(id, user);
-    }
-
-    @GetMapping("/{id}/history")
-    @Operation(summary = "Mostrar historial se sesiones")
-    public List<MeditationSession> getMeditationHistory(@PathVariable String id,
-                                                        @AuthenticationPrincipal User user) {
-        return petService.getMeditationHistory(id, user);
     }
 
     @GetMapping("/{id}/status")
