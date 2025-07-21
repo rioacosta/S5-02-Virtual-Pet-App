@@ -1,8 +1,6 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.PetDTO;
-import S502VirtualPetApp.dto.UserDTO;
-import S502VirtualPetApp.dto.admin.AdminUserWithPetsDTO;
+import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
@@ -12,12 +10,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @RestController

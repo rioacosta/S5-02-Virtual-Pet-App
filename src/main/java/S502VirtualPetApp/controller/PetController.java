@@ -1,20 +1,14 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.MeditationSessionDTO;
-import S502VirtualPetApp.dto.habitat.ChangeHabitatRequestDTO;
+import S502VirtualPetApp.dto.model.MeditationSessionDTO;
 import S502VirtualPetApp.dto.petActions.CreateVirtualPetRequestDTO;
-import S502VirtualPetApp.dto.petActions.HugRequestDTO;
 import S502VirtualPetApp.dto.petActions.MeditationRequestDTO;
-import S502VirtualPetApp.dto.PetDTO;
-import S502VirtualPetApp.model.MeditationSession;
+import S502VirtualPetApp.dto.model.PetDTO;
 import S502VirtualPetApp.model.User;
-import S502VirtualPetApp.model.VirtualPet;
-import S502VirtualPetApp.repository.VirtualPetRepository;
 import S502VirtualPetApp.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

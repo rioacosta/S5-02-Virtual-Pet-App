@@ -1,4 +1,4 @@
-package S502VirtualPetApp.dto;
+package S502VirtualPetApp.dto.model;
 
 import S502VirtualPetApp.model.MeditationSession;
 import lombok.Data;

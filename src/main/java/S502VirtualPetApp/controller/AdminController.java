@@ -1,7 +1,7 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.PetDTO;
-import S502VirtualPetApp.dto.UserDTO;
+import S502VirtualPetApp.dto.model.PetDTO;
+import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.admin.AdminUserWithPetsDTO;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.service.AdminService;

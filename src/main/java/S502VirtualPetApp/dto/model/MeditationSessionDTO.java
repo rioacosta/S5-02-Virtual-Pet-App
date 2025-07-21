@@ -1,4 +1,4 @@
-package S502VirtualPetApp.dto;
+package S502VirtualPetApp.dto.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

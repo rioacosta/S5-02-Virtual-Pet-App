@@ -1,7 +1,7 @@
 package S502VirtualPetApp.service;
 
-import S502VirtualPetApp.dto.MeditationSessionDTO;
-import S502VirtualPetApp.dto.PetDTO;
+import S502VirtualPetApp.dto.model.MeditationSessionDTO;
+import S502VirtualPetApp.dto.model.PetDTO;
 import S502VirtualPetApp.dto.petActions.CreateVirtualPetRequestDTO;
 import S502VirtualPetApp.model.MeditationSession;
 import S502VirtualPetApp.model.User;
@@ -118,7 +118,7 @@ public class PetService {
                         session.getDate(),
                         session.getDuration(),
                         session.getReward(),
-                        session.getHabitat() 
+                        session.getHabitat()
                 ))
                 .collect(Collectors.toList());
     }

@@ -1,7 +1,6 @@
 package S502VirtualPetApp.service;
 
-import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
-import S502VirtualPetApp.dto.UserDTO;
+import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
