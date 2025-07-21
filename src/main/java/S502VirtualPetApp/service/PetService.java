@@ -92,8 +92,6 @@ public class PetService {
         return toDTO(virtualPetRepository.save(pet));
     }
 
-
-
     public PetDTO hug(String petId, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
         pet.hug();
@@ -120,7 +118,7 @@ public class PetService {
                         session.getDate(),
                         session.getDuration(),
                         session.getReward(),
-                        pet.getHabitat() // asume que todas las sesiones comparten el mismo hábitat actual
+                        session.getHabitat() 
                 ))
                 .collect(Collectors.toList());
     }
@@ -207,7 +205,7 @@ public class PetService {
                                 session.getDate(),
                                 session.getDuration(),
                                 session.getReward(),
-                                pet.getHabitat() // si aplica el mismo habitat para todas
+                                session.getHabitat() // si aplica el mismo habitat para todas
                         ))
                         .collect(Collectors.toList())
         );

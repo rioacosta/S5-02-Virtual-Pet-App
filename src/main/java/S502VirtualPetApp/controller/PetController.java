@@ -24,7 +24,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/pets")
 public class PetController {
-    VirtualPetRepository virtualPetRepository;
     private final PetService petService;
 
     public PetController(PetService petService) {
