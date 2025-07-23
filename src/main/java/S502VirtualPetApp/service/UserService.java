@@ -25,6 +25,7 @@ public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BuddyService buddyService;
 
     // 🔒 Cargar usuario para autenticación
     @Override
@@ -36,9 +37,11 @@ public class UserService implements UserDetailsService {
     // 🟢 Crear usuario normal
     public User registerNewUser(@Valid UserDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
+            logger.error("Error user already exist: {}", request.getUsername());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
+            logger.error("Error user already exist: {}", request.getEmail());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
@@ -48,12 +51,9 @@ public class UserService implements UserDetailsService {
                 passwordEncoder.encode(request.getPassword()),
                 request.getRoles() == null ? Set.of(Role.USER) : request.getRoles()
         );
-
+        logger.info("User registration successful: {} - {}", request.getUsername(), request.getEmail());
         return userRepository.save(user);
     }
-
-    // 🟢 Crear administrador
-
 
     // 🕒 Actualizar último login
     public void updateLastLogin(String username) {
@@ -61,10 +61,13 @@ public class UserService implements UserDetailsService {
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
         });
+        logger.info("Updated last login for user: {}", username);
+
     }
 
     // 🔍 Obtener todos los usuarios
     public List<User> findAll() {
+        logger.info("Getting all users");
         return userRepository.findAll();
     }
 
@@ -88,6 +91,7 @@ public class UserService implements UserDetailsService {
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
+                logger.warn("User email is already in use: {}", request.getEmail());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
             }
             user.setEmail(request.getEmail());
@@ -95,11 +99,12 @@ public class UserService implements UserDetailsService {
 
         if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
             if (userRepository.existsByUsername(request.getUsername())) {
+                logger.warn("User name is already in use: {}", request.getUsername());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
             }
             user.setUsername(request.getUsername());
+            logger.info("User name updated: {}", request.getUsername());
         }
-
         return userRepository.save(user);
     }
 
@@ -109,6 +114,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            logger.error("Password mismatch for user: {}", username);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect current password");
         }
 

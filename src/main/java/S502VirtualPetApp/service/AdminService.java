@@ -1,14 +1,16 @@
 package S502VirtualPetApp.service;
 
-import S502VirtualPetApp.dto.model.PetDTO;
+import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
-import S502VirtualPetApp.dto.admin.AdminUserWithPetsDTO;
+import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
-import S502VirtualPetApp.repository.VirtualPetRepository;
+import S502VirtualPetApp.repository.VirtualBuddyRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,14 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class AdminService {
-
+    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final VirtualPetRepository virtualPetRepository;
-    private final PetService petService;
+    private final VirtualBuddyRepository virtualBuddyRepository;
+    private final BuddyService buddyService;
 
     public UserDTO createAdmin(RegisterUserRequestDTO request) {
+        logger.info("Creating new admin: {}", request.getUsername());
         User user = new User(
                 request.getUsername(),
                 request.getEmail(),
@@ -40,18 +43,21 @@ public class AdminService {
         return userRepository.findAll();
     }
 
-    public List<AdminUserWithPetsDTO> findUsersWithPets() {
+    public List<AdminUserWithBuddysDTO> findUsersWithBuddys() {
         return userRepository.findAll().stream().map(user -> {
-            List<PetDTO> pets = petService.getPetsByOwner(user);
-            return AdminUserWithPetsDTO.fromEntity(user, pets);
+            List<BuddyDTO> buddy = buddyService.getBuddysByOwner(user);
+            return AdminUserWithBuddysDTO.fromEntity(user, buddy);
         }).toList();
     }
 
     public User createUser(UserDTO dto) {
+        logger.info("Creating user: {}", dto.getUsername());
         if (userRepository.existsByUsername(dto.getUsername())) {
+            logger.warn("Conflict: username already exists");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
+            logger.warn("Conflict: email already exists");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
@@ -66,13 +72,16 @@ public class AdminService {
     }
 
     public void deleteUserByUsername(String username) {
+        logger.info("Deleting user: {}", username);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        virtualPetRepository.deleteAll(virtualPetRepository.findByOwner(user));
+        virtualBuddyRepository.deleteAll(virtualBuddyRepository.findByOwner(user));
         userRepository.delete(user);
     }
 
+
     public User toggleUserEnabled(String username) {
+        logger.info("Toggling user status: {}", username);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setEnabled(!user.isEnabled());

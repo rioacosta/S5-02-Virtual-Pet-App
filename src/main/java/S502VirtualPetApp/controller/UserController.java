@@ -1,112 +1,80 @@
 package S502VirtualPetApp.controller;
 
+import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
-import S502VirtualPetApp.service.PetService;
+import S502VirtualPetApp.service.BuddyService;
 import S502VirtualPetApp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final BuddyService buddyService;
     private final UserService userService;
-    private final PetService petService;
 
     @GetMapping("/me")
-    @Operation(summary = "Obtener el usuario autenticado")
+    @Operation(summary = "Getting an authenticated user")
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
+        logger.info("Getting actual user: {}", user.getUsername());
         return ResponseEntity.ok(UserDTO.fromEntity(user));
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Autoregistro de usuario")
+    @Operation(summary = "User self-registration")
     public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterUserRequestDTO request) {
+        logger.info("Registering new user: {}", request.getUsername());
         UserDTO dto = new UserDTO();
         dto.setUsername(request.getUsername());
         dto.setEmail(request.getEmail());
         dto.setPassword(request.getPassword());
-        dto.setRoles(Set.of(Role.USER)); // ← asigna rol USER por defecto
+        dto.setRoles(Set.of(Role.USER));
 
         User created = userService.registerNewUser(dto);
         return ResponseEntity.ok(UserDTO.fromEntity(created));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "Actualizar datos del usuario autenticado")
+    @Operation(summary = "Update data for authenticated user")
     public ResponseEntity<UserDTO> updateProfile(
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UserDTO userDTO
     ) {
+        logger.info("Updating profile for: {}", currentUser.getUsername());
         User updated = userService.updateUser(currentUser.getUsername(), userDTO);
         return ResponseEntity.ok(UserDTO.fromEntity(updated));
     }
 
+    @GetMapping("/buddys")
+    @Operation(summary = "Show user buddy´s")
+    public List<BuddyDTO> getMyBuddys(@AuthenticationPrincipal User user) {
+        return buddyService.getBuddysByOwner(user);
+    }
+
     @PatchMapping("/change-password")
-    @Operation(summary = "Cambiar contraseña del usuario autenticado")
+    @Operation(summary = "Change password for authenticated user")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal User user,
             @RequestParam String oldPassword,
             @RequestParam String newPassword
     ) {
+        logger.info("Changing password for: {}", user.getUsername());
         userService.changePassword(user.getUsername(), oldPassword, newPassword);
         return ResponseEntity.noContent().build();
     }
-
-    /*@PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create")
-    @Operation(summary = "\uD83D\uDD35 Crear nuevo usuario (admin)", description = "")
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
-        User created = userService.registerNewUser(userDTO);
-        return ResponseEntity.ok(UserDTO.fromEntity(created));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    @Operation(summary = "\uD83D\uDD35 Listar todos los usuarios (admin)", description = "")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<User> users = userService.findAll();
-        return ResponseEntity.ok(users.stream().map(UserDTO::fromEntity).toList());
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/users-with-pets")
-    @Operation(summary = "\uD83D\uDD35 Listar todos los usuarios con sus mascotas (admin)", description = "")
-    public List<AdminUserWithPetsDTO> getAllUsersWithPets() {
-        List<User> users = userService.findAll();
-        List<AdminUserWithPetsDTO> result = new ArrayList<>();
-
-        for (User user : users) {
-            List<PetDTO> pets = petService.getPetsByOwner(user); // ⬅️ Usas tu método existente
-            result.add(AdminUserWithPetsDTO.fromEntity(user, pets));
-        }
-
-        return result;
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{username}")
-    @Operation(summary = "\uD83D\uDD34 Eliminar usuario por username (admin)", description = "")
-    public ResponseEntity<Void> deleteByUsername(@PathVariable String username) {
-        userService.deleteByUsername(username);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{username}/toggle-enabled")
-    @Operation(summary = "\uD83D\uDD34 Bloquear o desbloquear usuario (admin)", description = "")
-    public ResponseEntity<UserDTO> toggleEnabled(@PathVariable String username) {
-        User updated = userService.toggleEnabled(username);
-        return ResponseEntity.ok(UserDTO.fromEntity(updated));
-    }*/
 }

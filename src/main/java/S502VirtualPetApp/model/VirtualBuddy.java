@@ -12,8 +12,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@Document(collection = "pets")
-public class VirtualPet {
+@Document(collection = "buddys")
+public class VirtualBuddy {
     @Id
     private String id;
     private String name;
@@ -31,11 +31,13 @@ public class VirtualPet {
     private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
     private List<String> avatarStages;
     private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial
+    private LocalDateTime lastInteraction;
+    private LocalDateTime lastHappinessCheck;
 
     @DBRef
     private User owner;
 
-    public VirtualPet() {
+    public VirtualBuddy() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.level = 1;
@@ -44,9 +46,11 @@ public class VirtualPet {
         this.meditationStreak = 0;
         this.totalMeditationMinutes = 0;
         this.avatarStages = new ArrayList<>();
+        this.lastHappinessCheck = LocalDateTime.now();
+
     }
 
-    public VirtualPet(String name, String type, User owner) {
+    public VirtualBuddy(String name, String type, User owner) {
         this();
         this.name = name;
         this.avatar = type;
@@ -63,6 +67,7 @@ public class VirtualPet {
         this.happiness = Math.min(100, this.happiness + (minutes / 2));
         this.lastMeditation = now;
         this.updatedAt = now;
+        this.lastInteraction = now;
 
         int requiredExp = level * 100;
         while (this.experience >= requiredExp) {
@@ -89,8 +94,10 @@ public class VirtualPet {
     }
 
     public void hug() {
+        LocalDateTime now = LocalDateTime.now();
         this.happiness = Math.min(100, this.happiness + 10);
-        this.lastHug = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.lastHug = now;
+        this.updatedAt = now;
+        this.lastInteraction = now;
     }
 }

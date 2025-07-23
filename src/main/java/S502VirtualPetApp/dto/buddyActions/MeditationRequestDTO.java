@@ -1,4 +1,4 @@
-package S502VirtualPetApp.dto.petActions;
+package S502VirtualPetApp.dto.buddyActions;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
