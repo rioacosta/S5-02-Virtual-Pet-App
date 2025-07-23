@@ -28,10 +28,12 @@ public class PetController {
         this.petService = petService;
     }
 
-    @GetMapping
-    @Operation(summary = "Show user buddy´s")
-    public List<PetDTO> getMyPets(@AuthenticationPrincipal User user) {
-        return petService.getPetsByOwner(user);
+    @PostMapping
+    @Operation(summary = "Create a new buddy")
+    public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request,
+                            @AuthenticationPrincipal User user) {
+        logger.debug("Creating buddy: {}", request);
+        return petService.createPet(request, user);
     }
 
     @GetMapping("/{id}")
@@ -39,14 +41,6 @@ public class PetController {
     public PetDTO getMyPet(@PathVariable String id, @AuthenticationPrincipal User user) {
         logger.info("PetController - Buscando mascota con ID: {}", id);
         return petService.getPetByIdOwned(id, user);
-    }
-
-    @PostMapping
-    @Operation(summary = "Create a new buddy")
-    public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request,
-                            @AuthenticationPrincipal User user) {
-        logger.debug("Creating buddy: {}", request);
-        return petService.createPet(request, user);
     }
 
     @PutMapping("/{id}")
@@ -83,7 +77,7 @@ public class PetController {
     }
 
     @GetMapping("/{id}/history")
-    @Operation(summary = "Mostrar historial de sesiones de meditación")
+    @Operation(summary = "Show meditation sessions history")
     public List<MeditationSessionDTO> getMeditationHistory(@PathVariable String id,
                                                            @AuthenticationPrincipal User user) {
         logger.info("Session history for: {}", id);
@@ -91,13 +85,14 @@ public class PetController {
     }
 
     @GetMapping("/{id}/rewards")
-    @Operation(summary = "Mostrar lista de recompensas")
+    @Operation(summary = "Show reward list")
     public List<String> getRewards(@PathVariable String id,
                                    @AuthenticationPrincipal User user) {
         return petService.getRewards(id, user);
     }
 
     @GetMapping("/{id}/status")
+    @Operation(summary = "Get buddy status")
     public PetDTO getFullStatus(@PathVariable String id,
                                 @AuthenticationPrincipal User user) {
         logger.info("Status for: {}", user.getId(), user.getUsername());

@@ -129,7 +129,6 @@ public class PetService {
                 .collect(Collectors.toList());
     }
 
-
     public String assignReward(int minutes) {
         return switch (minutes) {
             case 5 -> "flower";

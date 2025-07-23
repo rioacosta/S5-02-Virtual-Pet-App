@@ -27,6 +27,7 @@ public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PetService petService;
 
     // 🔒 Cargar usuario para autenticación
     @Override
