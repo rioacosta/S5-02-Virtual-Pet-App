@@ -1,10 +1,9 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.petActions.CreateVirtualPetRequestDTO;
+import S502VirtualPetApp.dto.buddyActions.CreateVirtualBuddyRequestDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class PetControllerIntegrationTest {
+public class VirtualBuddyControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,7 +25,7 @@ public class PetControllerIntegrationTest {
 
     @Test
     public void testCreateVirtualPet() throws Exception {
-        CreateVirtualPetRequestDTO petRequest = new CreateVirtualPetRequestDTO();
+        CreateVirtualBuddyRequestDTO petRequest = new CreateVirtualBuddyRequestDTO();
         petRequest.setName("Firulais");
         petRequest.setAvatar("Dog.png");
 

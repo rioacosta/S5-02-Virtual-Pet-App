@@ -1,11 +1,11 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.model.PetDTO;
+import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
-import S502VirtualPetApp.dto.admin.AdminUserWithPetsDTO;
+import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.service.AdminService;
-import S502VirtualPetApp.service.PetService;
+import S502VirtualPetApp.service.BuddyService;
 import S502VirtualPetApp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class AdminController {
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
     private final UserService userService;
     private final AdminService adminService;
-    private final PetService petService;
+    private final BuddyService buddyService;
 
     @PostMapping("/users")
     @CacheEvict(cacheNames = {"allUsers", "usersWithPets"}, allEntries = true)
@@ -52,14 +52,15 @@ public class AdminController {
     @GetMapping("/admin/users-with-pets")
     @Cacheable("usersWithPets")
     @Operation(summary = "\uD83D\uDD35 List all users with their pets (admin)")
-    public List<AdminUserWithPetsDTO> getAllUsersWithPets() {
+    public List<AdminUserWithBuddysDTO> getAllUsersWithBuddys() {
         logger.info("Obteniendo usuarios con mascotas (cached)");
         List<User> users = userService.findAll();
-        List<AdminUserWithPetsDTO> result = new ArrayList<>();
+        List<AdminUserWithBuddysDTO> result = new ArrayList<>();
+
 
         for (User user : users) {
-            List<PetDTO> pets = petService.getPetsByOwner(user); // ⬅️ Usas tu método existente
-            result.add(AdminUserWithPetsDTO.fromEntity(user, pets));
+            List<BuddyDTO> pets = buddyService.getBuddysByOwner(user); // ⬅️ Usas tu método existente
+            result.add(AdminUserWithBuddysDTO.fromEntity(user, pets));
         }
 
         return result;

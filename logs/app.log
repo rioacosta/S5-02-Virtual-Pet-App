@@ -115,7 +115,7 @@ org.springframework.dao.DataAccessResourceFailureException: Timed out while wait
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325) ~[spring-boot-3.5.3.jar:3.5.3]
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.5.3.jar:3.5.3]
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.5.3.jar:3.5.3]
-	at S502VirtualPetApp.S502VirtualPetAppApplication.main(S502VirtualPetAppApplication.java:12) ~[classes/:na]
+	at S502VirtualPetApp.S502MeditationBuddysAppApplication.main(S502VirtualPetAppApplication.java:12) ~[classes/:na]
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
 	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50) ~[spring-boot-devtools-3.5.3.jar:3.5.3]

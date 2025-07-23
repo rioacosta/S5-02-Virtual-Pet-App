@@ -1,4 +1,4 @@
-package S502VirtualPetApp.dto.petActions;
+package S502VirtualPetApp.dto.buddyActions;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

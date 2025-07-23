@@ -40,7 +40,7 @@ public class User implements UserDetails {
 
     @Transient
     @DBRef
-    private List<VirtualPet> pets = new ArrayList<>();
+    private List<VirtualBuddy> buddys = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;

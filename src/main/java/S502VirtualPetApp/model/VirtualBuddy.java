@@ -12,8 +12,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@Document(collection = "pets")
-public class VirtualPet {
+@Document(collection = "buddys")
+public class VirtualBuddy {
     @Id
     private String id;
     private String name;
@@ -35,7 +35,7 @@ public class VirtualPet {
     @DBRef
     private User owner;
 
-    public VirtualPet() {
+    public VirtualBuddy() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.level = 1;
@@ -46,7 +46,7 @@ public class VirtualPet {
         this.avatarStages = new ArrayList<>();
     }
 
-    public VirtualPet(String name, String type, User owner) {
+    public VirtualBuddy(String name, String type, User owner) {
         this();
         this.name = name;
         this.avatar = type;

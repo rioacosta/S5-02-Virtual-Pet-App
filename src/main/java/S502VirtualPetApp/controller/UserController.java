@@ -1,11 +1,11 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.model.PetDTO;
+import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
-import S502VirtualPetApp.service.PetService;
+import S502VirtualPetApp.service.BuddyService;
 import S502VirtualPetApp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    private final PetService petService;
+    private final BuddyService buddyService;
     private final UserService userService;
 
     @GetMapping("/me")
@@ -64,11 +64,11 @@ public class UserController {
         return ResponseEntity.ok(UserDTO.fromEntity(updated));
     }
 
-    @GetMapping("/pets")
-    @Cacheable(value = "userPets", key = "#user.id")
+    @GetMapping("/buddys")
+    @Cacheable(value = "userBuddys", key = "#user.id")
     @Operation(summary = "Show user buddy´s")
-    public List<PetDTO> getMyPets(@AuthenticationPrincipal User user) {
-        return petService.getPetsByOwner(user);
+    public List<BuddyDTO> getMyBuddys(@AuthenticationPrincipal User user) {
+        return buddyService.getBuddysByOwner(user);
     }
 
     @PatchMapping("/change-password")
