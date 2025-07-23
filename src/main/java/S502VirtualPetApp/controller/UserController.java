@@ -12,8 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -30,7 +29,6 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    @Cacheable(value = "currentUser", key = "#user.username")
     @Operation(summary = "Getting an authenticated user")
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
         logger.info("Getting actual user: {}", user.getUsername());
@@ -38,7 +36,6 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @CacheEvict(value = "currentUser", key = "#currentUser.username")
     @Operation(summary = "User self-registration")
     public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterUserRequestDTO request) {
         logger.info("Registering new user: {}", request.getUsername());
@@ -53,7 +50,6 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    @CacheEvict(value = "currentUser", key = "#currentUser.username")
     @Operation(summary = "Update data for authenticated user")
     public ResponseEntity<UserDTO> updateProfile(
             @AuthenticationPrincipal User currentUser,
@@ -65,14 +61,12 @@ public class UserController {
     }
 
     @GetMapping("/buddys")
-    @Cacheable(value = "userBuddys", key = "#user.id")
     @Operation(summary = "Show user buddy´s")
     public List<BuddyDTO> getMyBuddys(@AuthenticationPrincipal User user) {
         return buddyService.getBuddysByOwner(user);
     }
 
     @PatchMapping("/change-password")
-    @CacheEvict(value = "currentUser", key = "#user.username")
     @Operation(summary = "Change password for authenticated user")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal User user,

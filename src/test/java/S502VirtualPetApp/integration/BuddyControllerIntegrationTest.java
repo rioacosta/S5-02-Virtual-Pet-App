@@ -1,4 +1,4 @@
-package S502VirtualPetApp.controller;
+package S502VirtualPetApp.integration;
 
 import S502VirtualPetApp.dto.buddyActions.CreateVirtualBuddyRequestDTO;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class VirtualBuddyControllerIntegrationTest {
+public class BuddyControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -24,14 +24,14 @@ public class VirtualBuddyControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testCreateVirtualPet() throws Exception {
-        CreateVirtualBuddyRequestDTO petRequest = new CreateVirtualBuddyRequestDTO();
-        petRequest.setName("Firulais");
-        petRequest.setAvatar("Dog.png");
+    public void testCreateVirtualBuddy() throws Exception {
+        CreateVirtualBuddyRequestDTO buddyRequest = new CreateVirtualBuddyRequestDTO();
+        buddyRequest.setName("Firulais");
+        buddyRequest.setAvatar("Dog.png");
 
         mockMvc.perform(post("/api/pets/create")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(petRequest)))
+                        .content(objectMapper.writeValueAsString(buddyRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.petName").value("Firulais"));
     }

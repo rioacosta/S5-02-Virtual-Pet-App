@@ -11,11 +11,9 @@ import S502VirtualPetApp.repository.VirtualBuddyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -35,14 +33,13 @@ public class BuddyService {
     @Autowired
     private UserRepository userRepository;
 
-    @Cacheable(value = "petsByOwner", key = "#owner.getId()")
     public List<BuddyDTO> getBuddysByOwner(User owner) {
         return virtualBuddyRepository.findByOwner(owner).stream()
+                .peek(this::decayHappinessIfInactive)
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "pet", key = "#petId")
     public BuddyDTO getBuddyByIdOwned(String petId, User owner) {
         logger.info("Finding buddy whit ID: {}", petId);
         VirtualBuddy buddy = getAndValidateOwnership(petId, owner);
@@ -60,7 +57,6 @@ public class BuddyService {
         return pet;
     }
 
-    @CacheEvict(value = "buddysByOwner", key = "#owner.id")
     public BuddyDTO createBuddy(CreateVirtualBuddyRequestDTO request, User owner) {
         String avatar = request.getAvatar();
         if (avatar != null) {
@@ -72,7 +68,6 @@ public class BuddyService {
         return toDTO(saved);
     }
 
-    @CacheEvict(value = "buddy", key = "#buddyId")
     public BuddyDTO updateBuddy(String buddyId, BuddyDTO dto, User owner) {
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
         logger.info("Updating buddy: {} with avatar {}", dto.getId(), dto.getAvatar());
@@ -82,24 +77,12 @@ public class BuddyService {
         return toDTO(virtualBuddyRepository.save(buddy));
     }
 
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "buddy", key = "#buddyId"),
-                    @CacheEvict(value = "buddysByOwner", key = "#owner.id"),
-                    @CacheEvict(value = "buddyStatus", key = "#buddyId")
-            }    )
     public void deleteBuddy(String buddyId, User owner) {
         logger.info("Deleting buddy, type: {}", buddyId);
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
         virtualBuddyRepository.delete(buddy);
     }
 
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "buddy", key = "#buddyId"),
-                    @CacheEvict(value = "buddysByOwner", key = "#owner.id"),
-                    @CacheEvict(value = "buddyStatus", key = "#buddyId")
-            }    )
     public BuddyDTO meditate(String buddyId, int minutes, String habitat, User owner) {
         logger.info("Starting buddy meditation session: {}", buddyId, habitat);
         if (minutes < 1 || minutes > 120) {
@@ -118,12 +101,6 @@ public class BuddyService {
         return toDTO(virtualBuddyRepository.save(buddy));
     }
 
-    @Caching(
-            evict = {
-                    @CacheEvict(value = "buddy", key = "#buddyId"),
-                    @CacheEvict(value = "buddyByOwner", key = "#owner.id"),
-                    @CacheEvict(value = "buddyStatus", key = "#buddyId")
-            }    )
     public BuddyDTO hug(String buddyId, User owner) {
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
         logger.info("Hugging buddy: {}", buddyId);
@@ -172,24 +149,37 @@ public class BuddyService {
     }
 
     private void decayHappinessIfInactive(VirtualBuddy buddy) {
-        LocalDateTime lastInteraction = Stream.of(buddy.getLastMeditation(), buddy.getLastHug())
+        // 1. Usar la fecha más reciente entre interacciones y última verificación
+        LocalDateTime reference = Stream.of(
+                        buddy.getLastHappinessCheck(),
+                        buddy.getLastMeditation(),
+                        buddy.getLastHug()
+                )
                 .filter(Objects::nonNull)
                 .max(LocalDateTime::compareTo)
-                .orElse(null);
+                .orElse(buddy.getCreatedAt());
 
-        if (lastInteraction == null) {
-            buddy.setHappiness(0);
-            return;
-        }
+        // 2. Calcular días REALES de inactividad
+        long daysInactive = ChronoUnit.DAYS.between(
+                reference.toLocalDate(),
+                LocalDate.now()
+        );
 
-        long daysInactive = ChronoUnit.DAYS.between(lastInteraction, LocalDateTime.now());
+        // 3. Aplicar decaimiento solo si han pasado días
         if (daysInactive > 0) {
-            int decay = (int) (daysInactive * 5); // -5 puntos por día
+            int decay = (int) (daysInactive * 5);
             int newHappiness = Math.max(0, buddy.getHappiness() - decay);
             buddy.setHappiness(newHappiness);
+
+            // 4. Actualizar última verificación
+            buddy.setLastHappinessCheck(LocalDateTime.now());
             buddy.setUpdatedAt(LocalDateTime.now());
+
+            // 5. Guardar cambios en BD
+            virtualBuddyRepository.save(buddy);  // ✅ Critical!
         }
     }
+
     private List<String> buildAvatarStages(String avatar, int count) {
         List<String> stages = new ArrayList<>();
         if (avatar != null && avatar.endsWith(".png")) {
@@ -201,7 +191,12 @@ public class BuddyService {
         return stages;
     }
 
-    @Cacheable(value = "buddyStatus", key = "#petId")
+    private List<MeditationSession> convertSessionHistory(List<MeditationSession> sessions) {
+        return sessions.stream()
+                .map(s -> new MeditationSession(s.getDate(), s.getDuration(), s.getReward(), s.getHabitat()))
+                .toList();
+    }
+
     public BuddyDTO getFullStatus(String buddyId, User owner) {
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
         decayHappinessIfInactive(buddy);
@@ -222,20 +217,9 @@ public class BuddyService {
         dto.setLastMeditation(buddy.getLastMeditation());
         dto.setCreatedAt(buddy.getCreatedAt());
         dto.setUpdatedAt(buddy.getUpdatedAt());
-        //dto.setHabitat(pet.getHabitat());
         dto.setRewards(buddy.getRewards());
-        dto.setSessionHistory(
-                buddy.getSessionHistory().stream()
-                        .map(session -> new MeditationSession(
-                                session.getDate(),
-                                session.getDuration(),
-                                session.getReward(),
-                                session.getHabitat()
-                        ))
-                        .collect(Collectors.toList())
-        );
+        dto.setSessionHistory(convertSessionHistory(buddy.getSessionHistory()));
         dto.setOwnerId(buddy.getOwner() != null ? buddy.getOwner().getId() : null);
-
         dto.setAvatarStages(buildAvatarStages(buddy.getAvatar(), 4));
         return dto;
     }

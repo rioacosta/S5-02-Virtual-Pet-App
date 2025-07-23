@@ -31,6 +31,8 @@ public class VirtualBuddy {
     private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
     private List<String> avatarStages;
     private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial
+    private LocalDateTime lastInteraction;
+    private LocalDateTime lastHappinessCheck;
 
     @DBRef
     private User owner;
@@ -44,6 +46,8 @@ public class VirtualBuddy {
         this.meditationStreak = 0;
         this.totalMeditationMinutes = 0;
         this.avatarStages = new ArrayList<>();
+        this.lastHappinessCheck = LocalDateTime.now();
+
     }
 
     public VirtualBuddy(String name, String type, User owner) {
@@ -63,6 +67,7 @@ public class VirtualBuddy {
         this.happiness = Math.min(100, this.happiness + (minutes / 2));
         this.lastMeditation = now;
         this.updatedAt = now;
+        this.lastInteraction = now;
 
         int requiredExp = level * 100;
         while (this.experience >= requiredExp) {
@@ -89,8 +94,10 @@ public class VirtualBuddy {
     }
 
     public void hug() {
+        LocalDateTime now = LocalDateTime.now();
         this.happiness = Math.min(100, this.happiness + 10);
-        this.lastHug = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.lastHug = now;
+        this.updatedAt = now;
+        this.lastInteraction = now;
     }
 }

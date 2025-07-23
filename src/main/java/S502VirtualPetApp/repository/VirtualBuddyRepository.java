@@ -4,6 +4,7 @@ package S502VirtualPetApp.repository;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualBuddy;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

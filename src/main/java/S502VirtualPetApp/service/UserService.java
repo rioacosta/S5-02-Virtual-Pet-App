@@ -8,9 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,14 +29,12 @@ public class UserService implements UserDetailsService {
 
     // 🔒 Cargar usuario para autenticación
     @Override
-    @Cacheable(value = "userByUsername", key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     // 🟢 Crear usuario normal
-    @CacheEvict(value = "users", allEntries = true)
     public User registerNewUser(@Valid UserDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             logger.error("Error user already exist: {}", request.getUsername());
@@ -71,7 +66,6 @@ public class UserService implements UserDetailsService {
     }
 
     // 🔍 Obtener todos los usuarios
-    @Cacheable(value = "users")
     public List<User> findAll() {
         logger.info("Getting all users");
         return userRepository.findAll();
@@ -83,7 +77,6 @@ public class UserService implements UserDetailsService {
     }
 
     // 🗑️ Eliminar por username
-    @CacheEvict(value = "users", allEntries = true)
     public void deleteByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -92,10 +85,6 @@ public class UserService implements UserDetailsService {
     }
 
     // ✏️ Actualizar datos (nombre, email)
-    @Caching(evict = {
-            @CacheEvict(value = "userByUsername", key = "#username"),
-            @CacheEvict(value = "users", allEntries = true)
-    })
     public User updateUser(String username, UserDTO request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -120,7 +109,6 @@ public class UserService implements UserDetailsService {
     }
 
     // 🔒 Cambiar contraseña
-    @CacheEvict(value = "userByUsername", key = "#username")
     public void changePassword(String username, String oldPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -136,10 +124,6 @@ public class UserService implements UserDetailsService {
     }
 
     // 🟡 Activar / desactivar cuenta
-    @Caching(evict = {
-            @CacheEvict(value = "userByUsername", key = "#username"),
-            @CacheEvict(value = "users", allEntries = true)
-    })
     public User toggleEnabled(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

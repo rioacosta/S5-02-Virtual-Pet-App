@@ -10,9 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +18,17 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/pets")
-public class VirtualBuddyController {
-    private static final Logger logger = LoggerFactory.getLogger(VirtualBuddyController.class);
+@RequestMapping("/api/buddys")
+public class BuddyController {
+    private static final Logger logger = LoggerFactory.getLogger(BuddyController.class);
 
     private final BuddyService buddyService;
 
-    public VirtualBuddyController(BuddyService buddyService) {
+    public BuddyController(BuddyService buddyService) {
         this.buddyService = buddyService;
     }
 
-    @PostMapping
-    @CacheEvict(value = {"petsByOwner", "pet"}, allEntries = true)
+    @PostMapping("/create")
     @Operation(summary = "Create a new buddy")
     public BuddyDTO createBuddy(@Valid @RequestBody CreateVirtualBuddyRequestDTO request,
                                 @AuthenticationPrincipal User user) {
@@ -41,7 +37,6 @@ public class VirtualBuddyController {
     }
 
     @GetMapping("/{id}")
-    @Cacheable(value = "pet", key = "#id")
     @Operation(summary = "Show a buddy")
     public BuddyDTO getMyBuddy(@PathVariable String id, @AuthenticationPrincipal User user) {
         logger.info("BuddyController - Buscando buddy con ID: {}", id);
@@ -57,10 +52,6 @@ public class VirtualBuddyController {
     }
 
     @DeleteMapping("/{id}")
-    @Caching(evict = {
-            @CacheEvict(value = "buddy", key = "#buddyId"),
-            @CacheEvict(value = "buddysByOwner", key = "#owner.id")
-    })
     @Operation(summary = "Delete a buddy")
     public ResponseEntity<Void> deleteBuddy(@PathVariable String id, @AuthenticationPrincipal User user) {
         logger.info("Deleting buddy: {}", id);

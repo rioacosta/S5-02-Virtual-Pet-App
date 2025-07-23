@@ -11,9 +11,6 @@ import S502VirtualPetApp.repository.VirtualBuddyRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,7 +28,6 @@ public class AdminService {
     private final VirtualBuddyRepository virtualBuddyRepository;
     private final BuddyService buddyService;
 
-    @CacheEvict(value = "users", allEntries = true)
     public UserDTO createAdmin(RegisterUserRequestDTO request) {
         logger.info("Creating new admin: {}", request.getUsername());
         User user = new User(
@@ -43,7 +39,6 @@ public class AdminService {
         return UserDTO.fromEntity(userRepository.save(user));
     }
 
-    @Cacheable(value = "users")
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
@@ -55,7 +50,6 @@ public class AdminService {
         }).toList();
     }
 
-    @CacheEvict(value = "users", allEntries = true)
     public User createUser(UserDTO dto) {
         logger.info("Creating user: {}", dto.getUsername());
         if (userRepository.existsByUsername(dto.getUsername())) {
@@ -77,10 +71,7 @@ public class AdminService {
         return userRepository.save(user);
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "userByUsername", key = "#username"),
-            @CacheEvict(value = "users", allEntries = true)
-    })    public void deleteUserByUsername(String username) {
+    public void deleteUserByUsername(String username) {
         logger.info("Deleting user: {}", username);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -88,10 +79,7 @@ public class AdminService {
         userRepository.delete(user);
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "userByUsername", key = "#username"),
-            @CacheEvict(value = "users", allEntries = true)
-    })
+
     public User toggleUserEnabled(String username) {
         logger.info("Toggling user status: {}", username);
         User user = userRepository.findByUsername(username)
