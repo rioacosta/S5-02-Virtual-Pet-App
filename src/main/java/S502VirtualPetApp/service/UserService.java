@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -91,7 +92,10 @@ public class UserService implements UserDetailsService {
     }
 
     // ✏️ Actualizar datos (nombre, email)
-    @CacheEvict(value = "users", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "userByUsername", key = "#username"),
+            @CacheEvict(value = "users", allEntries = true)
+    })
     public User updateUser(String username, UserDTO request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -116,6 +120,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🔒 Cambiar contraseña
+    @CacheEvict(value = "userByUsername", key = "#username")
     public void changePassword(String username, String oldPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -131,7 +136,10 @@ public class UserService implements UserDetailsService {
     }
 
     // 🟡 Activar / desactivar cuenta
-    @CacheEvict(value = "users", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "userByUsername", key = "#username"),
+            @CacheEvict(value = "users", allEntries = true)
+    })
     public User toggleEnabled(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

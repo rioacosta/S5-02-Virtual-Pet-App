@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,7 @@ public class PetController {
     }
 
     @PostMapping
+    @CacheEvict(value = {"petsByOwner", "pet"}, allEntries = true)
     @Operation(summary = "Create a new buddy")
     public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request,
                             @AuthenticationPrincipal User user) {
@@ -37,6 +41,7 @@ public class PetController {
     }
 
     @GetMapping("/{id}")
+    @Cacheable(value = "pet", key = "#id")
     @Operation(summary = "Show a buddy")
     public PetDTO getMyPet(@PathVariable String id, @AuthenticationPrincipal User user) {
         logger.info("PetController - Buscando mascota con ID: {}", id);
@@ -52,6 +57,10 @@ public class PetController {
     }
 
     @DeleteMapping("/{id}")
+    @Caching(evict = {
+            @CacheEvict(value = "pet", key = "#petId"),
+            @CacheEvict(value = "petsByOwner", key = "#owner.id")
+    })
     @Operation(summary = "Delete a buddy")
     public ResponseEntity<Void> deletePet(@PathVariable String id, @AuthenticationPrincipal User user) {
         logger.info("Deleting buddy: {}", id);

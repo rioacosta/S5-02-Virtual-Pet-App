@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -59,6 +60,7 @@ public class PetService {
         return pet;
     }
 
+    @CacheEvict(value = "petsByOwner", key = "#owner.id")
     public PetDTO createPet(CreateVirtualPetRequestDTO request, User owner) {
         String avatar = request.getAvatar();
         if (avatar != null) {
@@ -80,12 +82,24 @@ public class PetService {
         return toDTO(virtualPetRepository.save(pet));
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "pet", key = "#petId"),
+                    @CacheEvict(value = "petsByOwner", key = "#owner.id"),
+                    @CacheEvict(value = "petStatus", key = "#petId")
+            }    )
     public void deletePet(String petId, User owner) {
         logger.info("Deleting buddy, type: {}", petId);
         VirtualPet pet = getAndValidateOwnership(petId, owner);
         virtualPetRepository.delete(pet);
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "pet", key = "#petId"),
+                    @CacheEvict(value = "petsByOwner", key = "#owner.id"),
+                    @CacheEvict(value = "petStatus", key = "#petId")
+            }    )
     public PetDTO meditate(String petId, int minutes, String habitat, User owner) {
         logger.info("Starting buddy meditation session: {}", petId, habitat);
         if (minutes < 1 || minutes > 120) {
@@ -104,6 +118,13 @@ public class PetService {
         return toDTO(virtualPetRepository.save(pet));
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "pet", key = "#petId"),
+                    @CacheEvict(value = "petsByOwner", key = "#owner.id"),
+                    @CacheEvict(value = "petStatus", key = "#petId")
+            }
+    )
     public PetDTO hug(String petId, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
         logger.info("Hugging buddy: {}", petId);
@@ -181,6 +202,7 @@ public class PetService {
         return stages;
     }
 
+    @Cacheable(value = "petStatus", key = "#petId")
     public PetDTO getFullStatus(String petId, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
         decayHappinessIfInactive(pet);

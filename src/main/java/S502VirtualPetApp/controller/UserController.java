@@ -65,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/pets")
+    @Cacheable(value = "userPets", key = "#user.id")
     @Operation(summary = "Show user buddy´s")
     public List<PetDTO> getMyPets(@AuthenticationPrincipal User user) {
         return petService.getPetsByOwner(user);

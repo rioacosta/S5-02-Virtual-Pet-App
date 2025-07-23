@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -76,8 +77,10 @@ public class AdminService {
         return userRepository.save(user);
     }
 
-    @CacheEvict(value = "users", allEntries = true)
-    public void deleteUserByUsername(String username) {
+    @Caching(evict = {
+            @CacheEvict(value = "userByUsername", key = "#username"),
+            @CacheEvict(value = "users", allEntries = true)
+    })    public void deleteUserByUsername(String username) {
         logger.info("Deleting user: {}", username);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -85,7 +88,10 @@ public class AdminService {
         userRepository.delete(user);
     }
 
-    @CacheEvict(value = "users", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "userByUsername", key = "#username"),
+            @CacheEvict(value = "users", allEntries = true)
+    })
     public User toggleUserEnabled(String username) {
         logger.info("Toggling user status: {}", username);
         User user = userRepository.findByUsername(username)
