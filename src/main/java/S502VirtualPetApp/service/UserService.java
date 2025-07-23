@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,17 +30,21 @@ public class UserService implements UserDetailsService {
 
     // 🔒 Cargar usuario para autenticación
     @Override
+    @Cacheable(value = "userByUsername", key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     // 🟢 Crear usuario normal
+    @CacheEvict(value = "users", allEntries = true)
     public User registerNewUser(@Valid UserDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
+            logger.error("Error user already exist: {}", request.getUsername());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
+            logger.error("Error user already exist: {}", request.getEmail());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
@@ -48,12 +54,9 @@ public class UserService implements UserDetailsService {
                 passwordEncoder.encode(request.getPassword()),
                 request.getRoles() == null ? Set.of(Role.USER) : request.getRoles()
         );
-
+        logger.info("User registration successful: {} - {}", request.getUsername(), request.getEmail());
         return userRepository.save(user);
     }
-
-    // 🟢 Crear administrador
-
 
     // 🕒 Actualizar último login
     public void updateLastLogin(String username) {
@@ -61,10 +64,14 @@ public class UserService implements UserDetailsService {
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
         });
+        logger.info("Updated last login for user: {}", username);
+
     }
 
     // 🔍 Obtener todos los usuarios
+    @Cacheable(value = "users")
     public List<User> findAll() {
+        logger.info("Getting all users");
         return userRepository.findAll();
     }
 
@@ -74,6 +81,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🗑️ Eliminar por username
+    @CacheEvict(value = "users", allEntries = true)
     public void deleteByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -82,12 +90,14 @@ public class UserService implements UserDetailsService {
     }
 
     // ✏️ Actualizar datos (nombre, email)
+    @CacheEvict(value = "users", allEntries = true)
     public User updateUser(String username, UserDTO request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
+                logger.warn("User email is already in use: {}", request.getEmail());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
             }
             user.setEmail(request.getEmail());
@@ -95,11 +105,12 @@ public class UserService implements UserDetailsService {
 
         if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
             if (userRepository.existsByUsername(request.getUsername())) {
+                logger.warn("User name is already in use: {}", request.getUsername());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
             }
             user.setUsername(request.getUsername());
+            logger.info("User name updated: {}", request.getUsername());
         }
-
         return userRepository.save(user);
     }
 
@@ -109,6 +120,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            logger.error("Password mismatch for user: {}", username);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect current password");
         }
 
@@ -118,6 +130,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🟡 Activar / desactivar cuenta
+    @CacheEvict(value = "users", allEntries = true)
     public User toggleEnabled(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

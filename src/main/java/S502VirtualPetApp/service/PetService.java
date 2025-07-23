@@ -8,7 +8,11 @@ import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualPet;
 import S502VirtualPetApp.repository.UserRepository;
 import S502VirtualPetApp.repository.VirtualPetRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class PetService {
+    private static final Logger logger = LoggerFactory.getLogger(PetService.class);
 
     @Autowired
     private VirtualPetRepository virtualPetRepository;
@@ -26,13 +31,16 @@ public class PetService {
     @Autowired
     private UserRepository userRepository;
 
+    @Cacheable(value = "petsByOwner", key = "#owner.getId()")
     public List<PetDTO> getPetsByOwner(User owner) {
         return virtualPetRepository.findByOwner(owner).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "pet", key = "#petId")
     public PetDTO getPetByIdOwned(String petId, User owner) {
+        logger.info("Finding buddy whit ID: {}", petId);
         VirtualPet pet = getAndValidateOwnership(petId, owner);
         return toDTO(pet);
     }
@@ -43,9 +51,10 @@ public class PetService {
 
     private VirtualPet getAndValidateOwnership(String petId, User owner) {
         VirtualPet pet = virtualPetRepository.findById(petId)
-                .orElseThrow(() -> new RuntimeException("Virtual Pet not found"));
+                .orElseThrow(() -> new RuntimeException("Virtual buddy not found"));
         if (!pet.getOwner().getId().equals(owner.getId())) {
-            throw new RuntimeException("Unauthorized access to pet");
+            logger.warn("Unauthorized access attempt by user: {}", owner.getId());
+            throw new RuntimeException("Unauthorized access to buddy");
         }
         return pet;
     }
@@ -55,30 +64,33 @@ public class PetService {
         if (avatar != null) {
             avatar = avatar.substring(avatar.lastIndexOf('/') + 1); // Extrae solo el nombre del archivo
         }
+        logger.info("Creating buddy, type: {}", request.getAvatar());
         VirtualPet pet = new VirtualPet(request.getName(), avatar, owner);
         VirtualPet saved = virtualPetRepository.save(pet);
         return toDTO(saved);
     }
 
-
+    @CacheEvict(value = "pet", key = "#petId")
     public PetDTO updatePet(String petId, PetDTO dto, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
-
+        logger.info("Updating buddy: {} with avatar {}", dto.getId(), dto.getAvatar());
         pet.setName(dto.getName());
         pet.setAvatar(dto.getAvatar());
         pet.setUpdatedAt(java.time.LocalDateTime.now());
-
         return toDTO(virtualPetRepository.save(pet));
     }
 
     public void deletePet(String petId, User owner) {
+        logger.info("Deleting buddy, type: {}", petId);
         VirtualPet pet = getAndValidateOwnership(petId, owner);
         virtualPetRepository.delete(pet);
     }
 
     public PetDTO meditate(String petId, int minutes, String habitat, User owner) {
+        logger.info("Starting buddy meditation session: {}", petId, habitat);
         if (minutes < 1 || minutes > 120) {
-            throw new IllegalArgumentException("Duración inválida");
+            logger.warn("Session is too long to process, should be less tha 120 minutes: {}", minutes);
+            throw new IllegalArgumentException("Session is too long");
         }
 
         VirtualPet pet = getAndValidateOwnership(petId, owner);
@@ -86,7 +98,7 @@ public class PetService {
         pet.meditate(minutes, reward, habitat);
 
         if (habitat != null && !habitat.isBlank()) {
-            pet.setHabitat(habitat); // << AÑADIR ESTO
+            pet.setHabitat(habitat);
         }
 
         return toDTO(virtualPetRepository.save(pet));
@@ -94,16 +106,10 @@ public class PetService {
 
     public PetDTO hug(String petId, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
+        logger.info("Hugging buddy: {}", petId);
         pet.hug();
         return toDTO(virtualPetRepository.save(pet));
     }
-
-    /*public PetDTO changeHabitat(String petId, String habitat, User owner) {
-        VirtualPet pet = getAndValidateOwnership(petId, owner);
-        pet.setHabitat(habitat);
-        pet.setUpdatedAt(java.time.LocalDateTime.now());
-        return toDTO(virtualPetRepository.save(pet));
-    }*/
 
     public List<String> getRewards(String petId, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
@@ -112,7 +118,7 @@ public class PetService {
 
     public List<MeditationSessionDTO> getMeditationHistoryDTO(String petId, User owner) {
         VirtualPet pet = getAndValidateOwnership(petId, owner);
-
+        logger.info("Session history for: {}", petId);
         return pet.getSessionHistory().stream()
                 .map(session -> new MeditationSessionDTO(
                         session.getDate(),
@@ -149,7 +155,6 @@ public class PetService {
     private void decayHappinessIfInactive(VirtualPet pet) {
         LocalDateTime lastMeditation = pet.getLastMeditation();
         LocalDateTime lastHug = pet.getLastHug();
-
         LocalDateTime latestInteraction = null;
 
         if (lastMeditation != null && lastHug != null) {
@@ -205,7 +210,7 @@ public class PetService {
                                 session.getDate(),
                                 session.getDuration(),
                                 session.getReward(),
-                                session.getHabitat() // si aplica el mismo habitat para todas
+                                session.getHabitat()
                         ))
                         .collect(Collectors.toList())
         );

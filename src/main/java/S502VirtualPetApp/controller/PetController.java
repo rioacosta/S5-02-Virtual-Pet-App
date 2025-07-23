@@ -8,6 +8,8 @@ import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/pets")
 public class PetController {
+    private static final Logger logger = LoggerFactory.getLogger(PetController.class);
+
     private final PetService petService;
 
     public PetController(PetService petService) {
@@ -25,65 +29,64 @@ public class PetController {
     }
 
     @GetMapping
-    @Operation(summary = "Mostrar las mascotas del usuario")
+    @Operation(summary = "Show user buddy´s")
     public List<PetDTO> getMyPets(@AuthenticationPrincipal User user) {
         return petService.getPetsByOwner(user);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Mostrar una mascota")
+    @Operation(summary = "Show a buddy")
     public PetDTO getMyPet(@PathVariable String id, @AuthenticationPrincipal User user) {
+        logger.info("PetController - Buscando mascota con ID: {}", id);
         return petService.getPetByIdOwned(id, user);
     }
 
     @PostMapping
-    @Operation(summary = "Crear una nueva mascota")
+    @Operation(summary = "Create a new buddy")
     public PetDTO createPet(@Valid @RequestBody CreateVirtualPetRequestDTO request,
                             @AuthenticationPrincipal User user) {
+        logger.debug("Creating buddy: {}", request);
         return petService.createPet(request, user);
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Modificar una mascota")
+    @Operation(summary = "Modify a buddy")
     public PetDTO updatePet(@PathVariable String id, @RequestBody PetDTO dto,
                             @AuthenticationPrincipal User user) {
+        logger.info("Updating buddy: {}", id, dto.getName());
         return petService.updatePet(id, dto, user);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar una mascota")
+    @Operation(summary = "Delete a buddy")
     public ResponseEntity<Void> deletePet(@PathVariable String id, @AuthenticationPrincipal User user) {
+        logger.info("Deleting buddy: {}", id);
         petService.deletePet(id, user);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/meditate")
-    @Operation(summary = "Solicitud de meditar")
+    @Operation(summary = "Meditation session request")
     public PetDTO meditate(@PathVariable String id,
                            @Valid @RequestBody MeditationRequestDTO request,
                            @AuthenticationPrincipal User user) {
+        logger.info("Starting meditation session for: {}", id);
         return petService.meditate(id, request.getMinutes(), request.getHabitat(), user);
     }
 
     @PostMapping("/{id}/hug")
-    @Operation(summary = "Solicitud de abrazo")
+    @Operation(summary = "Having a hug request")
     public PetDTO hug(@PathVariable String id,
                       @AuthenticationPrincipal User user) {
+        logger.info("Hugging: {}", id);
         return petService.hug(id, user);
     }
-
-    /*@PutMapping("/{id}/habitat")
-    @Operation(summary = "Solicitud de cambio de habitat")
-    public PetDTO changeHabitat(@PathVariable String id,
-                                @RequestBody ChangeHabitatRequestDTO request,
-                                @AuthenticationPrincipal User user) {
-        return petService.changeHabitat(id, request.getHabitat(), user);
-    }*/
 
     @GetMapping("/{id}/history")
     @Operation(summary = "Mostrar historial de sesiones de meditación")
     public List<MeditationSessionDTO> getMeditationHistory(@PathVariable String id,
                                                            @AuthenticationPrincipal User user) {
+        logger.info("Session history for: {}", id);
         return petService.getMeditationHistoryDTO(id, user);
     }
 
@@ -97,14 +100,16 @@ public class PetController {
     @GetMapping("/{id}/status")
     public PetDTO getFullStatus(@PathVariable String id,
                                 @AuthenticationPrincipal User user) {
+        logger.info("Status for: {}", user.getId(), user.getUsername());
         return petService.getFullStatus(id, user);
     }
 
     @PatchMapping("/{id}/rewards")
-    @Operation(summary = "Agregar una recompensa modular al buddy")
+    @Operation(summary = "Add reward to one buddy")
     public PetDTO addReward(@PathVariable String id,
                             @RequestBody Map<String, String> request,
                             @AuthenticationPrincipal User user) {
+        logger.info("Adding reward for: {}", id);
         String reward = request.get("reward");
         return petService.addReward(id, reward, user);
     }

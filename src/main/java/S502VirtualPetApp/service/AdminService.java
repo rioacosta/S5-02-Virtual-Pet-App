@@ -9,6 +9,10 @@ import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
 import S502VirtualPetApp.repository.VirtualPetRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +24,15 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class AdminService {
-
+    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VirtualPetRepository virtualPetRepository;
     private final PetService petService;
 
+    @CacheEvict(value = "users", allEntries = true)
     public UserDTO createAdmin(RegisterUserRequestDTO request) {
+        logger.info("Creating new admin: {}", request.getUsername());
         User user = new User(
                 request.getUsername(),
                 request.getEmail(),
@@ -36,6 +42,7 @@ public class AdminService {
         return UserDTO.fromEntity(userRepository.save(user));
     }
 
+    @Cacheable(value = "users")
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
@@ -47,11 +54,15 @@ public class AdminService {
         }).toList();
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public User createUser(UserDTO dto) {
+        logger.info("Creating user: {}", dto.getUsername());
         if (userRepository.existsByUsername(dto.getUsername())) {
+            logger.warn("Conflict: username already exists");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
+            logger.warn("Conflict: email already exists");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
@@ -65,14 +76,18 @@ public class AdminService {
         return userRepository.save(user);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public void deleteUserByUsername(String username) {
+        logger.info("Deleting user: {}", username);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         virtualPetRepository.deleteAll(virtualPetRepository.findByOwner(user));
         userRepository.delete(user);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public User toggleUserEnabled(String username) {
+        logger.info("Toggling user status: {}", username);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setEnabled(!user.isEnabled());
