@@ -32,13 +32,13 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtFilter;
 
-    @Bean
+    /*@Bean
     public DaoAuthenticationProvider daoAuthenticationProvider(UserService userService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
-    }
+    }*/
 
     @Bean
     public AuthenticationManager authenticationManager(UserService userService, PasswordEncoder passwordEncoder) {

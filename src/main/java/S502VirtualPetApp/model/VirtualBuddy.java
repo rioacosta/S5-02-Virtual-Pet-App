@@ -28,9 +28,9 @@ public class VirtualBuddy {
     private LocalDateTime lastMeditation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
+    private List<String> rewards = new ArrayList<>();
     private List<String> avatarStages;
-    private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial
+    private List<MeditationSession> sessionHistory = new ArrayList<>();
     private LocalDateTime lastInteraction;
     private LocalDateTime lastHappinessCheck;
 

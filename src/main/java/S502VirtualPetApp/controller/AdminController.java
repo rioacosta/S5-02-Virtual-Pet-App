@@ -66,7 +66,7 @@ public class AdminController {
         List<AdminUserWithBuddysDTO> result = new ArrayList<>();
 
         for (User user : users) {
-            List<BuddyDTO> pets = buddyService.getBuddysByOwner(user); // ⬅️ Usas tu método existente
+            List<BuddyDTO> pets = buddyService.getBuddysByOwner(user);
             result.add(AdminUserWithBuddysDTO.fromEntity(user, pets));
         }
         return result;
@@ -101,7 +101,7 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/users/{username}/roles")
-    @Operation(summary = "✏️ Actualizar roles de usuario (admin)")
+    @Operation(summary = "Modify user roles (admin)")
     public ResponseEntity<List<String>> updateUserRoles(@PathVariable String username,
                                                         @RequestBody List<String> newRoles) {
         logger.info("User roles updated: {}", username);

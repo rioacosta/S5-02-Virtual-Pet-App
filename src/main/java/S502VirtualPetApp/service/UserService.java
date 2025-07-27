@@ -130,15 +130,15 @@ public class UserService implements UserDetailsService {
         logger.info("Password changed for user: {}", username);
     }
 
-    // 🟡 Activar / desactivar cuenta
+    /*// 🟡 Activar / desactivar cuenta
     public User toggleEnabled(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setEnabled(!user.isEnabled());
         return userRepository.save(user);
-    }
+    }*/
 
-    // 📦 Convertir entidad a UserDTO
+    /*// 📦 Convertir entidad a UserDTO
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
@@ -149,6 +149,6 @@ public class UserService implements UserDetailsService {
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastLogin(user.getLastLogin());
         return dto;
-    }
+    }*/
 
 }

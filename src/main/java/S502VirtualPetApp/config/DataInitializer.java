@@ -24,7 +24,7 @@ public class DataInitializer {
                         Set.of(Role.ADMIN, Role.USER)
                 );
                 userRepository.save(admin);
-                System.out.println("✅ Usuario admin creado: admin / admin123");
+                System.out.println("✅ Admin created: admin / admin123");
             }
         };
 

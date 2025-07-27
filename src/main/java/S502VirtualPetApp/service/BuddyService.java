@@ -31,8 +31,8 @@ public class BuddyService {
     @Autowired
     private VirtualBuddyRepository virtualBuddyRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    /*@Autowired
+    private UserRepository userRepository;*/
 
     public List<BuddyDTO> getBuddysByOwner(User owner) {
         return virtualBuddyRepository.findByOwner(owner).stream()
@@ -63,7 +63,6 @@ public class BuddyService {
         VirtualBuddy buddy = virtualBuddyRepository.findById(petId)
                 .orElseThrow(() -> new RuntimeException("Virtual buddy not found"));
 
-        // Verificar si es admin o dueño usando el enum
         boolean isAdmin = user.getRoles().contains(Role.ADMIN) ||
                 user.getRoles().contains(Role.ADMIN);
         boolean isOwner = buddy.getOwner().getId().equals(user.getId());
@@ -72,7 +71,6 @@ public class BuddyService {
             logger.warn("Unauthorized access attempt by user: {}", user.getId());
             throw new RuntimeException("Unauthorized access to buddy");
         }
-
         return buddy;
     }
 
@@ -112,10 +110,6 @@ public class BuddyService {
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
         String reward = assignReward(minutes);
         buddy.meditate(minutes, reward, habitat);
-
-        /*if (habitat != null && !habitat.isBlank()) {
-            buddy.setHabitat(habitat);
-        }*/
 
         return toDTO(virtualBuddyRepository.save(buddy));
     }

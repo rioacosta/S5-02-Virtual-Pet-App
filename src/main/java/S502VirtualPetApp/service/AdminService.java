@@ -47,12 +47,12 @@ public class AdminService {
         return userRepository.findAll();
     }
 
-    public List<AdminUserWithBuddysDTO> findUsersWithBuddys() {
+    /*public List<AdminUserWithBuddysDTO> findUsersWithBuddys() {
         return userRepository.findAll().stream().map(user -> {
             List<BuddyDTO> buddy = buddyService.getBuddysByOwner(user);
             return AdminUserWithBuddysDTO.fromEntity(user, buddy);
         }).toList();
-    }
+    }*/
 
     public AdminUserWithBuddysDTO findUserWithBuddysByUsername(String username) {
         User user = userRepository.findByUsername(username)
