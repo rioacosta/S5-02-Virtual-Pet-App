@@ -75,8 +75,6 @@ public class JwtUtil {
         return createToken(claims, userDetails.getUsername());
     }
 
-
-
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -100,13 +98,4 @@ public class JwtUtil {
         }
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            logger.error("JWT token validation failed: {}", e.getMessage());
-            return false;
-        }
-    }
 }
