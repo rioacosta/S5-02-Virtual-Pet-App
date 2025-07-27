@@ -9,16 +9,16 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RegisterUserRequestDTO {
-    @NotBlank(message = "El nombre de usuario es obligatorio")
+    @NotBlank(message = "Its mandatory to have a name")
     @Size(min = 3, max = 20)
     private String username;
 
-    @Email(message = "Debe proporcionar un email válido")
-    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Must provide a valid email")
+    @NotBlank(message = "Email is mandatory")
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
+    @NotBlank(message = "Password can't be blank")
+    @Size(min = 6, message = "Password should have at least 6 characters")
     private String password;
 
 }

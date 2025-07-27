@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class HugRequestDTO {
-    @NotBlank(message = "El ID del usuario que envía el abrazo es obligatorio")
+    @NotBlank(message = "User ID is mandatory for a hug")
     private String senderId;
 
 }

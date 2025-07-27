@@ -1,5 +1,6 @@
 package S502VirtualPetApp.service;
 
+import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
 import S502VirtualPetApp.dto.model.MeditationSessionDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.buddyActions.CreateVirtualBuddyRequestDTO;
@@ -7,7 +8,6 @@ import S502VirtualPetApp.model.MeditationSession;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualBuddy;
-import S502VirtualPetApp.repository.UserRepository;
 import S502VirtualPetApp.repository.VirtualBuddyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

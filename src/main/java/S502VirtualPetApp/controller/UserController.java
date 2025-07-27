@@ -1,6 +1,6 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.AuthUpdateResponse;
+import S502VirtualPetApp.dto.AuthUpdateResponseDTO;
 import S502VirtualPetApp.dto.UserUpdateRequestDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
@@ -64,7 +64,7 @@ public class UserController {
 
     @PutMapping("/update")
     @Operation(summary = "User self-updating")
-    public ResponseEntity<AuthUpdateResponse> updateUser(
+    public ResponseEntity<AuthUpdateResponseDTO> updateUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid UserUpdateRequestDTO request) {
         String username = userDetails.getUsername();
@@ -75,7 +75,7 @@ public class UserController {
         String newToken = jwtUtil.generateToken(updatedUser);
         logger.info("Generated token: {}", newToken);
 
-        return ResponseEntity.ok(new AuthUpdateResponse(UserDTO.fromEntity(updatedUser), newToken));
+        return ResponseEntity.ok(new AuthUpdateResponseDTO(UserDTO.fromEntity(updatedUser), newToken));
     }
 
 

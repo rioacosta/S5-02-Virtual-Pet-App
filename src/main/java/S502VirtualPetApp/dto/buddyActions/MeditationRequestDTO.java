@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MeditationRequestDTO {
-    @Min(value = 1, message = "Debe meditar al menos 1 minuto")
-    @Max(value = 120, message = "No se puede meditar más de 2 horas")
+    @Min(value = 1, message = "Meditation session should be at least 1 minute")
+    @Max(value = 120, message = "Meditation session can't be more than 2 hours")
     private int minutes;
     private String habitat;
 }

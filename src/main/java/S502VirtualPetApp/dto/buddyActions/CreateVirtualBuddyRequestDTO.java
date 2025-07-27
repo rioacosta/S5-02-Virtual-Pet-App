@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class CreateVirtualBuddyRequestDTO {
-    @NotBlank(message = "El nombre de la mascota no puede estar vacío")
-    @Size(min = 2, max = 30, message = "El nombre debe tener entre 2 y 30 caracteres")
+    @NotBlank(message = "Buddy name must be present")
+    @Size(min = 2, max = 30, message = "Name should be between 2 and 30 characters")
     private String name;
 
-    @NotBlank(message = "El avatar no puede estar vacío")
+    @NotBlank(message = "Avatar can't be blank")
     private String avatar;
 }

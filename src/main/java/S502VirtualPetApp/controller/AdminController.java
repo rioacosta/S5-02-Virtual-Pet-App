@@ -59,17 +59,10 @@ public class AdminController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users-with-buddys")
-    @Operation(summary = "\uD83D\uDD35 List all users with their pets (admin)")
+    @Operation(summary = "🔵 List all users with their pets (admin)")
     public List<AdminUserWithBuddysDTO> getAllUsersWithBuddys() {
-        logger.info("Getting all users with their buddys (cached)");
-        List<User> users = userService.findAll();
-        List<AdminUserWithBuddysDTO> result = new ArrayList<>();
-
-        for (User user : users) {
-            List<BuddyDTO> pets = buddyService.getBuddysByOwner(user);
-            result.add(AdminUserWithBuddysDTO.fromEntity(user, pets));
-        }
-        return result;
+        logger.info("Getting all users with their buddys");
+        return adminService.findUsersWithBuddys();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
