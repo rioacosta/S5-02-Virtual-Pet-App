@@ -121,14 +121,9 @@ public class BuddyService {
         return toDTO(virtualBuddyRepository.save(buddy));
     }
 
-    public List<String> getRewards(String buddyId, User owner) {
-        VirtualBuddy pet = getAndValidateOwnership(buddyId, owner);
-        return pet.getRewards();
-    }
-
     public List<MeditationSessionDTO> getMeditationHistoryDTO(String buddyId, User owner) {
         VirtualBuddy pet = getAndValidateOwnership(buddyId, owner);
-        logger.info("Session history for: {}", buddyId);
+        logger.info("Session history for buddy: {}", buddyId);
         return pet.getSessionHistory().stream()
                 .map(session -> new MeditationSessionDTO(
                         session.getDate(),
@@ -137,6 +132,11 @@ public class BuddyService {
                         session.getHabitat()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public List<String> getRewards(String buddyId, User owner) {
+        VirtualBuddy pet = getAndValidateOwnership(buddyId, owner);
+        return pet.getRewards();
     }
 
     public String assignReward(int minutes) {
@@ -157,7 +157,6 @@ public class BuddyService {
             buddy.setUpdatedAt(java.time.LocalDateTime.now());
             virtualBuddyRepository.save(buddy);
         }
-
         return toDTO(buddy);
     }
 

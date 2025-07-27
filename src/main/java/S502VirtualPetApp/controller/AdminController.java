@@ -75,7 +75,7 @@ public class AdminController {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{username}")
+    @DeleteMapping("delete/{username}")
     @Operation(summary = "\uD83D\uDD34 Delete user by name (admin)", description = "")
     public ResponseEntity<Void> deleteByUsername(@PathVariable String username) {
         logger.warn("Deleting user: {}", username);

@@ -32,7 +32,7 @@ public class BuddyController {
     @Operation(summary = "Create a new buddy")
     public BuddyDTO createBuddy(@Valid @RequestBody CreateVirtualBuddyRequestDTO request,
                                 @AuthenticationPrincipal User user) {
-        logger.debug("Creating buddy: {}", request);
+        logger.info("Creating buddy: {}", request);
         return buddyService.createBuddy(request, user);
     }
 
