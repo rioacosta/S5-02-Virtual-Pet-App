@@ -70,7 +70,7 @@ public class JwtUtil {
                 .map(authority -> authority.getAuthority())
                 .toList();
 
-        claims.put("roles", roles);  // 🌈 Añade el claim correcto
+        claims.put("roles", roles);
 
         return createToken(claims, userDetails.getUsername());
     }
