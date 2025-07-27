@@ -1,5 +1,6 @@
 package S502VirtualPetApp.service;
 
+import S502VirtualPetApp.dto.UserUpdateRequestDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
@@ -85,19 +86,25 @@ public class UserService implements UserDetailsService {
     }
 
     // ✏️ Actualizar datos (nombre, email)
-    public User updateUser(String username, UserDTO request) {
+    public User updateUser(String username, UserUpdateRequestDTO request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+        if (request.getEmail() != null && !request.getEmail().isBlank() &&
+                !request.getEmail().equals(user.getEmail())) {
+
             if (userRepository.existsByEmail(request.getEmail())) {
                 logger.warn("User email is already in use: {}", request.getEmail());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
             }
             user.setEmail(request.getEmail());
+            logger.info("User email updated: {}", request.getEmail());
         }
 
-        if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
+
+        if (request.getUsername() != null && !request.getUsername().isBlank() &&
+                !request.getUsername().equals(user.getUsername())) {
+
             if (userRepository.existsByUsername(request.getUsername())) {
                 logger.warn("User name is already in use: {}", request.getUsername());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
@@ -105,6 +112,7 @@ public class UserService implements UserDetailsService {
             user.setUsername(request.getUsername());
             logger.info("User name updated: {}", request.getUsername());
         }
+
         return userRepository.save(user);
     }
 
