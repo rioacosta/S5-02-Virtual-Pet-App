@@ -8,6 +8,7 @@ import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
 import S502VirtualPetApp.repository.VirtualBuddyRepository;
+import S502VirtualPetApp.security.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +29,18 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final VirtualBuddyRepository virtualBuddyRepository;
     private final BuddyService buddyService;
+    private final AuthUtil authUtil;
 
     public UserDTO createAdmin(RegisterUserRequestDTO request) {
         logger.info("Creating new admin: {}", request.getUsername());
-        User user = new User(
+        User admin = new User(
                 request.getUsername(),
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
                 Set.of(Role.ADMIN, Role.USER)
         );
-        return UserDTO.fromEntity(userRepository.save(user));
+        User savedAdmin = userRepository.save(admin);
+        return UserDTO.fromEntity(userRepository.save(savedAdmin));
     }
 
     public List<User> findAllUsers() {
@@ -50,35 +54,41 @@ public class AdminService {
         }).toList();
     }
 
-    public User createUser(UserDTO dto) {
-        logger.info("Creating user: {}", dto.getUsername());
-        if (userRepository.existsByUsername(dto.getUsername())) {
-            logger.warn("Conflict: username already exists");
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
-        }
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            logger.warn("Conflict: email already exists");
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+    public void safeDeleteUserByUsername(String targetUsername) {
+        String currentUser = authUtil.getCurrentUser().getUsername();
+
+        if (targetUsername.equals(currentUser)) {
+            logger.warn("Intento bloqueado: el admin '{}' quiso eliminarse a sí mismo.", currentUser);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puedes eliminarte a ti mismo.");
         }
 
-        User user = new User(
-                dto.getUsername(),
-                dto.getEmail(),
-                passwordEncoder.encode(dto.getPassword()),
-                dto.getRoles() == null ? Set.of(Role.USER) : dto.getRoles()
-        );
-
-        return userRepository.save(user);
-    }
-
-    public void deleteUserByUsername(String username) {
-        logger.info("Deleting user: {}", username);
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         virtualBuddyRepository.deleteAll(virtualBuddyRepository.findByOwner(user));
         userRepository.delete(user);
     }
 
+    public List<String> safeUpdateUserRoles(String targetUsername, List<String> newRoles) {
+        String currentUser = authUtil.getCurrentUser().getUsername();
+
+        if (targetUsername.equals(currentUser) && !newRoles.contains("ADMIN")) {
+            logger.warn("El admin '{}' intentó quitarse su rol ADMIN.", currentUser);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puedes quitarte el rol ADMIN.");
+        }
+
+        User user = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Set<Role> updatedRoles = newRoles.stream()
+                .map(Role::valueOf)
+                .collect(Collectors.toSet());
+
+        user.setRoles(updatedRoles);
+        userRepository.save(user);
+
+        return updatedRoles.stream().map(Enum::name).toList();
+    }
 
     public User toggleUserEnabled(String username) {
         logger.info("Toggling user status: {}", username);

@@ -15,5 +15,5 @@ public class MeditationSession {
     private LocalDateTime date;
     private int duration;
     private String reward;
-    private String habitat; // ⬅️ NUEVO
+    private String habitat;
 }

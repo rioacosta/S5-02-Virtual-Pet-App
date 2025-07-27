@@ -41,7 +41,7 @@ public class VirtualBuddy {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.level = 1;
-        this.experience = 0;
+        this.experience = 5;
         this.happiness = 50;
         this.meditationStreak = 0;
         this.totalMeditationMinutes = 0;

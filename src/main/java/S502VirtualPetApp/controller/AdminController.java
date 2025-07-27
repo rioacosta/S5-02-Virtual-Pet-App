@@ -1,8 +1,10 @@
 package S502VirtualPetApp.controller;
 
+import S502VirtualPetApp.dto.UserUpdateRequestDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
+import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.service.AdminService;
 import S502VirtualPetApp.service.BuddyService;
@@ -12,12 +14,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -29,13 +36,19 @@ public class AdminController {
     private final AdminService adminService;
     private final BuddyService buddyService;
 
-    @PostMapping("/users")
-    @Operation(summary = "\uD83D\uDD35 Create new user (admin)", description = "")
-    public UserDTO createUser(@RequestBody @Valid UserDTO dto) {
-        logger.info("Creating new user: {}", dto.getUsername());
-        return UserDTO.fromEntity(adminService.createUser(dto));
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create-admin")
+    @Operation(summary = "\uD83D\uDD35 Create new admin", description = "")
+    public UserDTO createAdmin (@RequestBody @Valid RegisterUserRequestDTO dto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String adminUsername = auth.getName();
+        User adminUser = userService.findByUsername(adminUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin user not found"));
+        logger.info("Admin {} is creating a new admin: {}", adminUser.getUsername(), dto.getUsername());
+        return adminService.createAdmin(dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     @Operation(summary = "\uD83D\uDD35 List all users (admin)", description = "")
     public List<UserDTO> getAllUsers() {
@@ -64,16 +77,40 @@ public class AdminController {
     @Operation(summary = "\uD83D\uDD34 Delete user by name (admin)", description = "")
     public ResponseEntity<Void> deleteByUsername(@PathVariable String username) {
         logger.warn("Deleting user: {}", username);
-        userService.deleteByUsername(username);
+        adminService.safeDeleteUserByUsername(username);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/users/{username}/toggle-enabled")
     @Operation(summary = "\uD83D\uDD34 Temporary block a user (admin)", description = "")
     public ResponseEntity<UserDTO> toggleEnabled(@PathVariable String username) {
-        logger.info("Cambiando estado de usuario: {}", username);
+        logger.info("User temporary blocked: {}", username);
         User updated = adminService.toggleUserEnabled(username);
         return ResponseEntity.ok(UserDTO.fromEntity(updated));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/users/{username}/roles")
+    @Operation(summary = "✏️ Actualizar roles de usuario (admin)")
+    public ResponseEntity<List<String>> updateUserRoles(@PathVariable String username,
+                                                        @RequestBody List<String> newRoles) {
+        logger.info("User roles updated: {}", username);
+        List<String> updated = adminService.safeUpdateUserRoles(username, newRoles);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("/users/{username}/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Update users data (admin)")
+    public ResponseEntity<?> updateUserByAdmin(@PathVariable String username,
+                                               @RequestBody UserUpdateRequestDTO dto) {
+        Optional<User> targetUser = userService.findByUsername(username);
+        if (targetUser.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        logger.info("User data updated: {}", username);
+        userService.updateUser(targetUser.get().getUsername(), dto);
+        return ResponseEntity.ok().build();
+    }
 }

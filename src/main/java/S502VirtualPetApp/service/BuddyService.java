@@ -4,6 +4,7 @@ import S502VirtualPetApp.dto.model.MeditationSessionDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.buddyActions.CreateVirtualBuddyRequestDTO;
 import S502VirtualPetApp.model.MeditationSession;
+import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualBuddy;
 import S502VirtualPetApp.repository.UserRepository;
@@ -40,21 +41,39 @@ public class BuddyService {
                 .collect(Collectors.toList());
     }
 
-    public BuddyDTO getBuddyByIdOwned(String petId, User owner) {
-        logger.info("Finding buddy whit ID: {}", petId);
-        VirtualBuddy buddy = getAndValidateOwnership(petId, owner);
+    public BuddyDTO getBuddyByIdOwned(String petId, User user) {
+        logger.info("Finding buddy with ID: {}", petId);
+        VirtualBuddy buddy = virtualBuddyRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Virtual buddy not found"));
+
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN) ||
+                user.getRoles().contains(Role.ADMIN);
+        boolean isOwner = buddy.getOwner().getId().equals(user.getId());
+
+        if (!isOwner && !isAdmin) {
+            logger.warn("Unauthorized access attempt by user: {}", user.getId());
+            throw new RuntimeException("Unauthorized access to buddy");
+        }
+
         decayHappinessIfInactive(buddy);
         return toDTO(buddy);
     }
 
-    private VirtualBuddy getAndValidateOwnership(String petId, User owner) {
-        VirtualBuddy pet = virtualBuddyRepository.findById(petId)
+    private VirtualBuddy getAndValidateOwnership(String petId, User user) {
+        VirtualBuddy buddy = virtualBuddyRepository.findById(petId)
                 .orElseThrow(() -> new RuntimeException("Virtual buddy not found"));
-        if (!pet.getOwner().getId().equals(owner.getId())) {
-            logger.warn("Unauthorized access attempt by user: {}", owner.getId());
+
+        // Verificar si es admin o dueño usando el enum
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN) ||
+                user.getRoles().contains(Role.ADMIN);
+        boolean isOwner = buddy.getOwner().getId().equals(user.getId());
+
+        if (!isOwner && !isAdmin) {
+            logger.warn("Unauthorized access attempt by user: {}", user.getId());
             throw new RuntimeException("Unauthorized access to buddy");
         }
-        return pet;
+
+        return buddy;
     }
 
     public BuddyDTO createBuddy(CreateVirtualBuddyRequestDTO request, User owner) {
