@@ -73,6 +73,15 @@ public class AdminController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users/{username}")
+    @Operation(summary = "Get user by username with their buddies (admin)")
+    public ResponseEntity<AdminUserWithBuddysDTO> getUserWithBuddysByUsername(@PathVariable String username) {
+        AdminUserWithBuddysDTO userWithBuddys = adminService.findUserWithBuddysByUsername(username);
+        return ResponseEntity.ok(userWithBuddys);
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{username}")
     @Operation(summary = "\uD83D\uDD34 Delete user by name (admin)", description = "")
     public ResponseEntity<Void> deleteByUsername(@PathVariable String username) {

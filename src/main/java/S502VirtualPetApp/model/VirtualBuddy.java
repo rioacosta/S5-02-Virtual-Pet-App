@@ -20,6 +20,7 @@ public class VirtualBuddy {
     private String avatar;
     private int level;
     private int experience;
+    private int totalExperience;
     private int happiness;
     private int meditationStreak;
     private int totalMeditationMinutes;
@@ -27,7 +28,6 @@ public class VirtualBuddy {
     private LocalDateTime lastMeditation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String habitat; // 🌄 Imagen de fondo
     private List<String> rewards = new ArrayList<>(); // 🎁 Recompensas gráficas
     private List<String> avatarStages;
     private List<MeditationSession> sessionHistory = new ArrayList<>(); // 📜 Historial
@@ -64,6 +64,7 @@ public class VirtualBuddy {
 
         this.totalMeditationMinutes += minutes;
         this.experience += minutes * 10;
+        this.totalExperience += minutes * 10;
         this.happiness = Math.min(100, this.happiness + (minutes / 2));
         this.lastMeditation = now;
         this.updatedAt = now;

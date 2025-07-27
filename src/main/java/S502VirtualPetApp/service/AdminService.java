@@ -54,6 +54,13 @@ public class AdminService {
         }).toList();
     }
 
+    public AdminUserWithBuddysDTO findUserWithBuddysByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        List<BuddyDTO> buddies = buddyService.getBuddysByOwner(user);
+        return AdminUserWithBuddysDTO.fromEntity(user, buddies);
+    }
+
     public void safeDeleteUserByUsername(String targetUsername) {
         String currentUser = authUtil.getCurrentUser().getUsername();
 

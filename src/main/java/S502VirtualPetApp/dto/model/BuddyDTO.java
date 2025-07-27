@@ -13,6 +13,7 @@ public class BuddyDTO {
     private String avatar;
     private int level;
     private int experience;
+    private int totalExperience;
     private int happiness;
     private int meditationStreak;
     private int totalMeditationMinutes;
@@ -20,7 +21,6 @@ public class BuddyDTO {
     private LocalDateTime lastMeditation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String habitat;
     private List<String> rewards;
     private List<MeditationSession> sessionHistory;
     private List<String> avatarStages;

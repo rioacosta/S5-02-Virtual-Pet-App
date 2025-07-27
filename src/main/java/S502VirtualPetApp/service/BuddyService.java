@@ -113,9 +113,9 @@ public class BuddyService {
         String reward = assignReward(minutes);
         buddy.meditate(minutes, reward, habitat);
 
-        if (habitat != null && !habitat.isBlank()) {
+        /*if (habitat != null && !habitat.isBlank()) {
             buddy.setHabitat(habitat);
-        }
+        }*/
 
         return toDTO(virtualBuddyRepository.save(buddy));
     }
@@ -229,6 +229,7 @@ public class BuddyService {
         dto.setAvatar(buddy.getAvatar());
         dto.setLevel(buddy.getLevel());
         dto.setExperience(buddy.getExperience());
+        dto.setTotalExperience(buddy.getTotalExperience());
         dto.setHappiness(buddy.getHappiness());
         dto.setMeditationStreak(buddy.getMeditationStreak());
         dto.setTotalMeditationMinutes(buddy.getTotalMeditationMinutes());
