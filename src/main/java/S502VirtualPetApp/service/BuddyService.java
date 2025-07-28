@@ -3,6 +3,7 @@ package S502VirtualPetApp.service;
 import S502VirtualPetApp.dto.model.MeditationSessionDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.buddyActions.CreateVirtualBuddyRequestDTO;
+import S502VirtualPetApp.exception.UnauthorizedAccessException;
 import S502VirtualPetApp.model.MeditationSession;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
@@ -48,24 +49,29 @@ public class BuddyService {
 
         if (!isOwner && !isAdmin) {
             logger.warn("Unauthorized access attempt by user: {}", user.getId());
-            throw new RuntimeException("Unauthorized access to buddy");
+            throw new UnauthorizedAccessException("Unauthorized access to buddy");
         }
 
         decayHappinessIfInactive(buddy);
         return toDTO(buddy);
     }
 
-    private VirtualBuddy getAndValidateOwnership(String petId, User user) {
-        VirtualBuddy buddy = virtualBuddyRepository.findById(petId)
+    private VirtualBuddy getAndValidateOwnership(String buddyId, User user) {
+        VirtualBuddy buddy = virtualBuddyRepository.findById(buddyId)
                 .orElseThrow(() -> new RuntimeException("Virtual buddy not found"));
 
-        boolean isAdmin = user.getRoles().contains(Role.ADMIN) ||
-                user.getRoles().contains(Role.ADMIN);
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN);
         boolean isOwner = buddy.getOwner().getId().equals(user.getId());
 
+        logger.info("Vadating acces - User: {}, Buddy Owner: {}, isAdmin: {}, isOwner: {}",
+                user.getId(),
+                buddy.getOwner() != null ? buddy.getOwner().getId() : "null",
+                isAdmin,
+                isOwner);
+
         if (!isOwner && !isAdmin) {
-            logger.warn("Unauthorized access attempt by user: {}", user.getId());
-            throw new RuntimeException("Unauthorized access to buddy");
+            logger.warn("Unauthorized access attempt by user: {}  to buddy: {}",  user.getId(), buddyId);
+            throw new UnauthorizedAccessException("Unauthorized access to buddy");
         }
         return buddy;
     }
@@ -73,7 +79,7 @@ public class BuddyService {
     public BuddyDTO createBuddy(CreateVirtualBuddyRequestDTO request, User owner) {
         String avatar = request.getAvatar();
         if (avatar != null) {
-            avatar = avatar.substring(avatar.lastIndexOf('/') + 1); // Extrae solo el nombre del archivo
+            avatar = avatar.substring(avatar.lastIndexOf('/') + 1);
         }
         logger.info("Creating buddy, type: {}", request.getAvatar());
         VirtualBuddy buddy = new VirtualBuddy(request.getName(), avatar, owner);

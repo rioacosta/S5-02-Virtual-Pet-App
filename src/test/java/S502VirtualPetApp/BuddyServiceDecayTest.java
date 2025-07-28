@@ -1,6 +1,5 @@
 package S502VirtualPetApp;
 
-
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualBuddy;
 import S502VirtualPetApp.repository.VirtualBuddyRepository;
@@ -10,18 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 public class BuddyServiceDecayTest {
 
