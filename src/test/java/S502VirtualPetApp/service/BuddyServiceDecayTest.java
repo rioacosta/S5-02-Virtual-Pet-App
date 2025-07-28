@@ -1,9 +1,8 @@
-package S502VirtualPetApp;
+package S502VirtualPetApp.service;
 
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.model.VirtualBuddy;
 import S502VirtualPetApp.repository.VirtualBuddyRepository;
-import S502VirtualPetApp.service.BuddyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

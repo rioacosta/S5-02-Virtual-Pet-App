@@ -13,8 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.MongoDBContainer;
@@ -31,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class BuddyStatusIntegrationTest {
+public class BuddyStatusIntegrationTest extends BaseMongoIntegrationTest {
 
     private static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.0");
 
@@ -43,12 +41,7 @@ public class BuddyStatusIntegrationTest {
     @Autowired private PasswordEncoder passwordEncoder;
 
     private String jwtToken;
-    private String adminBuddyId;  // Nuevo: almacenar ID del buddy
-
-    @DynamicPropertySource
-    static void mongoProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
+    private String adminBuddyId;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -85,7 +78,6 @@ public class BuddyStatusIntegrationTest {
                 .andReturn();
 
         // Obtener ID del buddy creado
-        // Depuración: Imprime la respuesta completa
         String responseBody = createResult.getResponse().getContentAsString();
         System.out.println("DEBUG - Buddy creado: " + responseBody);
 
@@ -96,11 +88,11 @@ public class BuddyStatusIntegrationTest {
         String ownerId = jsonNode.get("ownerId").asText();
         String adminId = admin.getId(); // Asegúrate de tener esta variable
 
-        System.out.println("DEBUG - Owner ID del buddy: " + ownerId);
-        System.out.println("DEBUG - ID del admin: " + adminId);
+        System.out.println("DEBUG - Buddy owner ID: " + ownerId);
+        System.out.println("DEBUG - Admin ID: " + adminId);
 
         if (!ownerId.equals(adminId)) {
-            throw new AssertionError("El buddy no está asignado al usuario admin");
+            throw new AssertionError("Buddy its not owned by user admin");
         }
     }
 

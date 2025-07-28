@@ -1,11 +1,10 @@
-package S502VirtualPetApp;
+package S502VirtualPetApp.service;
 
 
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
-import S502VirtualPetApp.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 

@@ -13,10 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,11 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class CreateBuddyControllerWithAuthIntegrationTest {
-
-    private static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.0");
-
-    static {        mongoDBContainer.start();     }
+public class CreateBuddyControllerWithAuthIntegrationTest extends BaseMongoIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
 
@@ -48,11 +41,6 @@ public class CreateBuddyControllerWithAuthIntegrationTest {
     @Autowired private PasswordEncoder passwordEncoder;
 
     private String jwtToken;
-
-    @DynamicPropertySource
-    static void mongoProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
 
     @BeforeEach
     void setUp() {
