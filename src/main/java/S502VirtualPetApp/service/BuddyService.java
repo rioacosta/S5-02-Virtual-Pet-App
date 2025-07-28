@@ -1,6 +1,5 @@
 package S502VirtualPetApp.service;
 
-import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
 import S502VirtualPetApp.dto.model.MeditationSessionDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.buddyActions.CreateVirtualBuddyRequestDTO;
@@ -30,9 +29,6 @@ public class BuddyService {
 
     @Autowired
     private VirtualBuddyRepository virtualBuddyRepository;
-
-    /*@Autowired
-    private UserRepository userRepository;*/
 
     public List<BuddyDTO> getBuddysByOwner(User owner) {
         return virtualBuddyRepository.findByOwner(owner).stream()
