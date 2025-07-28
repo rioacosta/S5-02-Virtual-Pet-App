@@ -1,11 +1,13 @@
 package S502VirtualPetApp.model;
 
+import S502VirtualPetApp.exception.CooldownException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +98,12 @@ public class VirtualBuddy {
 
     public void hug() {
         LocalDateTime now = LocalDateTime.now();
+        if (this.lastHug != null) {
+            Duration cooldown = Duration.between(this.lastHug, now);
+            if (cooldown.toMinutes() < 1) {
+                throw new CooldownException("You need to wait before hugging again");
+            }
+        }
         this.happiness = Math.min(100, this.happiness + 10);
         this.lastHug = now;
         this.updatedAt = now;

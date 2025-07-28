@@ -77,7 +77,7 @@ public class CreateBuddyControllerWithAuthIntegrationTest extends BaseMongoInteg
         buddyRequest.setName("Firulais");
         buddyRequest.setAvatar("Dog.png");
 
-        mockMvc.perform(post("/api/pets/create")
+        mockMvc.perform(post("/api/buddys/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(buddyRequest)))
                 .andDo(print())
