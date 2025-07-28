@@ -100,8 +100,8 @@ public class VirtualBuddy {
         LocalDateTime now = LocalDateTime.now();
         if (this.lastHug != null) {
             Duration cooldown = Duration.between(this.lastHug, now);
-            if (cooldown.toMinutes() < 1) {
-                throw new CooldownException("You need to wait before hugging again");
+            if (cooldown.toMinutes() < 2) {
+                throw new CooldownException("espera un par de minutos y vuelve a darle amor"); //En castellano para el front
             }
         }
         this.happiness = Math.min(100, this.happiness + 10);

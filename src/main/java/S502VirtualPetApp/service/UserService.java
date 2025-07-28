@@ -2,6 +2,7 @@ package S502VirtualPetApp.service;
 
 import S502VirtualPetApp.dto.UserUpdateRequestDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
+import S502VirtualPetApp.exception.UserNotFoundException;
 import S502VirtualPetApp.model.Role;
 import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
@@ -31,7 +32,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
     }
 
     // 🟢 Crear usuario normal
