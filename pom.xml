@@ -194,6 +194,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Mongo embebido para pruebas -->
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>4.7.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Open Api -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -224,13 +232,6 @@
 		<dependency>
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<version>4.7.1</version>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
