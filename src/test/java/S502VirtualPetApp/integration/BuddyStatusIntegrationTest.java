@@ -29,10 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class BuddyStatusIntegrationTest {
 
-    private static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.0");
-
-    static { mongoDBContainer.start(); }
-
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private UserRepository userRepository;
