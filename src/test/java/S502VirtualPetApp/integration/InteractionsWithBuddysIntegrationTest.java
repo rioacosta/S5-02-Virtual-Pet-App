@@ -7,10 +7,12 @@ import S502VirtualPetApp.model.User;
 import S502VirtualPetApp.repository.UserRepository;
 import S502VirtualPetApp.repository.VirtualBuddyRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,17 +20,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.http.MediaType;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.util.Set;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class InteractionsWithBuddysIntegrationTest extends BaseMongoIntegrationTest{
+public class InteractionsWithBuddysIntegrationTest{
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,6 +44,14 @@ public class InteractionsWithBuddysIntegrationTest extends BaseMongoIntegrationT
     private String jwtToken;
     private String buddyId;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @BeforeEach
+    void setup() {
+        // Limpia la base antes de cada test
+        mongoTemplate.getDb().drop();
+    }
     @Test
     void testMeditationSessionFlow() throws Exception {
         // Crear usuario
