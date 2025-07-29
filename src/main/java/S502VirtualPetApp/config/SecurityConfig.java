@@ -32,14 +32,6 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtFilter;
 
-    /*@Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(UserService userService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }*/
-
     @Bean
     public AuthenticationManager authenticationManager(UserService userService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -79,6 +71,7 @@ public class SecurityConfig {
                                 "/src/test/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/actuator/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui.html",
                                 "/api/pets/debug-create",

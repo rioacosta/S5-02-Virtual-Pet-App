@@ -90,6 +90,11 @@ public class BuddyStatusIntegrationTest {
         }
     }
 
+    /*@Test
+    void adminGetsAllBuddys() {
+        MvcResult createResult = mockMvc.perform()
+    }*/
+
     @Test
     void happinessShouldDecayThroughStatusEndpoint() throws Exception {
         // Usar el ID almacenado en la ruta

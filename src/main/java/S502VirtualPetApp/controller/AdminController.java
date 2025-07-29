@@ -1,7 +1,6 @@
 package S502VirtualPetApp.controller;
 
 import S502VirtualPetApp.dto.UserUpdateRequestDTO;
-import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
@@ -22,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +50,7 @@ public class AdminController {
     @GetMapping("/users")
     @Operation(summary = "\uD83D\uDD35 List all users (admin)", description = "")
     public List<UserDTO> getAllUsers() {
-        logger.info("Getting all users (cached)");
+        logger.info("Getting all users");
         return adminService.findAllUsers().stream()
                 .map(UserDTO::fromEntity)
                 .toList();
