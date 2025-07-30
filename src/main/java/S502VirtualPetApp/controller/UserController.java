@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,6 +77,14 @@ public class UserController {
         logger.info("Generated token: {}", newToken);
 
         return ResponseEntity.ok(new AuthUpdateResponseDTO(UserDTO.fromEntity(updatedUser), newToken));
+    }
+
+    @DeleteMapping("delete/{username}")
+    @Operation(summary = "User self-delete by name", description = "")
+    public ResponseEntity<Void> deleteByUsername(@PathVariable String username) {
+        logger.warn("Deleting user: {}", username);
+        userService.deleteByUsername(username);
+        return ResponseEntity.noContent().build();
     }
 
 

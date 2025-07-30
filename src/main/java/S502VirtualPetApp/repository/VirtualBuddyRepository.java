@@ -13,6 +13,4 @@ import java.util.Optional;
 @Repository
 public interface VirtualBuddyRepository extends MongoRepository<VirtualBuddy, String> {
     List<VirtualBuddy> findByOwner(User owner);
-    Optional<VirtualBuddy> findByIdAndOwner(String id, User owner);
-    long countByOwner(User owner);
 }
