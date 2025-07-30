@@ -54,7 +54,7 @@ public class BuddyServiceDecayTest {
         method.invoke(buddyService, buddy);
 
         verify(buddyRepository, times(1)).save(any(VirtualBuddy.class));
-        assertEquals(65, buddy.getHappiness(), "Debería decaer 10 puntos (2 días * 5)");
+        assertEquals(0, buddy.getHappiness(), "Should decay 100 points (2 días * 50)");
     }
 
     @Test
@@ -82,6 +82,6 @@ public class BuddyServiceDecayTest {
         method.invoke(buddyService, buddy);
 
         // Solo 1 día desde el último hug => decay = 5
-        assertEquals(85, buddy.getHappiness(), "La felicidad debería decaer 5 puntos");
+        assertEquals(40, buddy.getHappiness(), "La felicidad debería decaer 5 puntos");
     }
 }

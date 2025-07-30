@@ -44,12 +44,12 @@ public class VirtualBuddy {
         this.updatedAt = LocalDateTime.now();
         this.level = 1;
         this.experience = 5;
+        this.totalExperience = 5;
         this.happiness = 50;
         this.meditationStreak = 0;
         this.totalMeditationMinutes = 0;
         this.avatarStages = new ArrayList<>();
         this.lastHappinessCheck = LocalDateTime.now();
-
     }
 
     public VirtualBuddy(String name, String type, User owner) {
@@ -65,9 +65,9 @@ public class VirtualBuddy {
         LocalDateTime previousMeditation = this.lastMeditation;
 
         this.totalMeditationMinutes += minutes;
-        this.experience += minutes * 10;
-        this.totalExperience += minutes * 10;
-        this.happiness = Math.min(100, this.happiness + (minutes / 2));
+        this.experience += minutes * 3;
+        this.totalExperience += minutes * 3;
+        this.happiness = Math.min(100, this.happiness + (minutes)); //   / 2));
         this.lastMeditation = now;
         this.updatedAt = now;
         this.lastInteraction = now;

@@ -103,10 +103,10 @@ public class InteractionsWithBuddysIntegrationTest{
         BuddyDTO buddy = objectMapper.readValue(responseJson, BuddyDTO.class);
 
         // Verificaciones
-        assertEquals(2, buddy.getLevel()); // Subió de nivel
-        assertEquals(5, buddy.getExperience()); // Se reinicia tras subir
-        assertEquals(100, buddy.getTotalExperience());
-        assertEquals(55, buddy.getHappiness()); // 50 base + 5
+        assertEquals(1, buddy.getLevel());
+        assertEquals(35, buddy.getExperience());
+        assertEquals(35, buddy.getTotalExperience());
+        assertEquals(60, buddy.getHappiness());
         assertEquals(1, buddy.getMeditationStreak());
         assertEquals(10, buddy.getTotalMeditationMinutes());
         assertNotNull(buddy.getLastMeditation());

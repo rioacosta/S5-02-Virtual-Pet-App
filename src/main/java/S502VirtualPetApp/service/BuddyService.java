@@ -181,7 +181,7 @@ public class BuddyService {
 
         // 3. Aplicar decaimiento solo si han pasado días
         if (daysInactive > 0) {
-            int decay = (int) (daysInactive * 5);
+            int decay = (int) (daysInactive * 50);
             int newHappiness = Math.max(0, buddy.getHappiness() - decay);
             buddy.setHappiness(newHappiness);
 
