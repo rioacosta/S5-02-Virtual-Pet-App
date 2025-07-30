@@ -12,6 +12,8 @@ import S502VirtualPetApp.repository.VirtualBuddyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -96,12 +98,14 @@ public class BuddyService {
         return toDTO(virtualBuddyRepository.save(buddy));
     }
 
+    @CacheEvict(value = {"meditationHistory", "buddyRewards"}, key = "#buddyId")
     public void deleteBuddy(String buddyId, User owner) {
         logger.info("Deleting buddy, type: {}", buddyId);
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
         virtualBuddyRepository.delete(buddy);
     }
 
+    @CacheEvict(value = {"meditationHistory", "buddyRewards"}, key = "#buddyId")
     public BuddyDTO meditate(String buddyId, int minutes, String habitat, User owner) {
         logger.info("Starting buddy meditation session: {}", buddyId, habitat);
         if (minutes < 1 || minutes > 120) {
@@ -123,6 +127,7 @@ public class BuddyService {
         return toDTO(virtualBuddyRepository.save(buddy));
     }
 
+    @Cacheable(value = "meditationHistory", key = "#buddyId")
     public List<MeditationSessionDTO> getMeditationHistoryDTO(String buddyId, User owner) {
         VirtualBuddy pet = getAndValidateOwnership(buddyId, owner);
         logger.info("Session history for buddy: {}", buddyId);
@@ -136,6 +141,7 @@ public class BuddyService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "buddyRewards", key = "#buddyId")
     public List<String> getRewards(String buddyId, User owner) {
         VirtualBuddy pet = getAndValidateOwnership(buddyId, owner);
         return pet.getRewards();
@@ -151,6 +157,7 @@ public class BuddyService {
         };
     }
 
+    @CacheEvict(value = "buddyRewards", key = "#buddyId")
     public BuddyDTO addReward(String buddyId, String rewardName, User owner) {
         VirtualBuddy buddy = getAndValidateOwnership(buddyId, owner);
 

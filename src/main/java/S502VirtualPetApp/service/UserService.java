@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -73,11 +75,13 @@ public class UserService implements UserDetailsService {
     }
 
     // 🔍 Buscar por username
+    @Cacheable(value = "users", key = "#username")
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
     // 🗑️ Eliminar por username
+    @CacheEvict(value = "users", key = "#username")
     public void deleteByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -86,6 +90,7 @@ public class UserService implements UserDetailsService {
     }
 
     // ✏️ Actualizar datos (nombre, email)
+    @CacheEvict(value = "users", key = "#username")
     public User updateUser(String username, UserUpdateRequestDTO request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -117,6 +122,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 🔒 Cambiar contraseña
+    @CacheEvict(value = "users", key = "#username")
     public void changePassword(String username, String oldPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
