@@ -65,7 +65,7 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users/{username}")
-    @Operation(summary = "Get user by username with their buddies (admin)")
+    @Operation(summary = "\uD83D\uDD35Get user by username with their buddies (admin)")
     public ResponseEntity<AdminUserWithBuddysDTO> getUserWithBuddysByUsername(@PathVariable String username) {
         AdminUserWithBuddysDTO userWithBuddys = adminService.findUserWithBuddysByUsername(username);
         return ResponseEntity.ok(userWithBuddys);
@@ -92,7 +92,7 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/users/{username}/roles")
-    @Operation(summary = "Modify user roles (admin)")
+    @Operation(summary = "\uD83D\uDD35Modify user roles (admin)")
     public ResponseEntity<List<String>> updateUserRoles(@PathVariable String username,
                                                         @RequestBody List<String> newRoles) {
         logger.info("User roles updated: {}", username);
@@ -102,7 +102,7 @@ public class AdminController {
 
     @PutMapping("/users/{username}/update")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @Operation(summary = "Update users data (admin)")
+    @Operation(summary = "\uD83D\uDD35Update users data (admin)")
     public ResponseEntity<?> updateUserByAdmin(@PathVariable String username,
                                                @RequestBody UserUpdateRequestDTO dto) {
         Optional<User> targetUser = userService.findByUsername(username);
