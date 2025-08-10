@@ -9,4 +9,4 @@ RUN ./mvnw package -DskipTests
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/S5.02.-Mascota-Virtual-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/Meditation-Buddys-0.0.1-SNAPSHOT.jar"]

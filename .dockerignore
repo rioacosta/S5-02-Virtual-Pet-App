@@ -1,0 +1,36 @@
+# Carpeta de compilación y archivos jar ya generados
+target/
+*.jar
+*.jar.original
+
+# Logs
+logs/
+*.log
+*.log.*.gz
+
+# IDEs y editores
+.idea/
+.vscode/
+*.iml
+
+# Sistema y control de versiones
+.git
+.gitattributes
+.gitignore
+
+# Maven Wrapper y carpetas generadas
+.mvn/wrapper/maven-wrapper.jar
+generated-sources/
+generated-test-sources/
+maven-archiver/
+maven-status/
+surefire-reports/
+test-classes/
+classes/
+
+# Archivos de ayuda y otros no necesarios
+HELP.md
+README.md
+
+# Scripts de entorno Windows/Mac/Linux si no son necesarios
+mvnw.cmd

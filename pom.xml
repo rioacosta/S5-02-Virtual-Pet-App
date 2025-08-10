@@ -10,8 +10,8 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>S5.02-</groupId>
-	<artifactId>-Meditation-Buddys</artifactId>
+	<groupId>S5.02</groupId>
+	<artifactId>Meditation-Buddys</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Meditation Buddys</name>
 	<description>Aplicación web con Spring Boot y React para una mascota que guía meditaciones</description>
