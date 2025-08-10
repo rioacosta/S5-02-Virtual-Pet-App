@@ -46,7 +46,7 @@ public class AdminController {
         return adminService.createAdmin(dto);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    /*@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     @Operation(summary = "\uD83D\uDD35 List all users (admin)", description = "")
     public List<UserDTO> getAllUsers() {
@@ -54,7 +54,7 @@ public class AdminController {
         return adminService.findAllUsers().stream()
                 .map(UserDTO::fromEntity)
                 .toList();
-    }
+    }*/
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users-with-buddys")
     @Operation(summary = "🔵 List all users with their pets (admin)")
