@@ -1,7 +1,7 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.AuthUpdateResponseDTO;
-import S502VirtualPetApp.dto.UserUpdateRequestDTO;
+import S502VirtualPetApp.dto.userOptions.AuthUpdateResponseDTO;
+import S502VirtualPetApp.dto.userOptions.UserUpdateRequestDTO;
 import S502VirtualPetApp.dto.model.BuddyDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;
@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;

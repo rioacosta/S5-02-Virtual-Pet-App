@@ -1,6 +1,6 @@
 package S502VirtualPetApp.controller;
 
-import S502VirtualPetApp.dto.UserUpdateRequestDTO;
+import S502VirtualPetApp.dto.userOptions.UserUpdateRequestDTO;
 import S502VirtualPetApp.dto.model.UserDTO;
 import S502VirtualPetApp.dto.admin.AdminUserWithBuddysDTO;
 import S502VirtualPetApp.dto.registerAndLogin.RegisterUserRequestDTO;

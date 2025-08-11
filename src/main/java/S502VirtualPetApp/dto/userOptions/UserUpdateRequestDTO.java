@@ -1,4 +1,4 @@
-package S502VirtualPetApp.dto;
+package S502VirtualPetApp.dto.userOptions;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
