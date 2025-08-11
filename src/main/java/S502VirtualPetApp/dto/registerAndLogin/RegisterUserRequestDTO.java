@@ -10,7 +10,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class RegisterUserRequestDTO {
     @NotBlank(message = "Its mandatory to have a name")
-    @Size(min = 3, max = 20)
+    @Size(min = 2, max = 20)
     private String username;
 
     @Email(message = "Must provide a valid email")
