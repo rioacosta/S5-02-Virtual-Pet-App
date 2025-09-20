@@ -76,7 +76,7 @@ Trabajo autónomo, creativo y reflexivo.
 
 
 
-1 - Abre el siguiente enlace y ten un poco de paciencia mientras despierta el servidor gratuito:
+1 - Abre el siguiente enlace y ten un poco de paciencia mientras despierta el servidor gratuito: Si quieres la experiencia completa accede con estas credenciales -> usuaria: admin  password: Ladesiempre
 
 
 
