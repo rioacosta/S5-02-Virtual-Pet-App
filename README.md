@@ -66,7 +66,61 @@ Trabajo autónomo, creativo y reflexivo.
 
 ---
 
+
+
 ## Comenzando 🚀
+
+https://meditation-buddys.vercel.app/
+
+Aterrizaras en la pagina de autenticación donde puedes ir al registro, debes pulsar "registrarse" agregar un nombre de usuario, correo y contraseña, espera 2 o 3 minutos a que aparezca el aviso de "REGISTRO ALINEADO", este retraso se debe a que el servidor gratuito tarda en "despertar" antes de procesar la información.
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 000758" src="https://github.com/user-attachments/assets/8db00fbe-93ef-46de-9bca-5f435794ed9f" />
+
+
+
+Automaticamente la aplicación redirigira al inicio de sesion y solo debes pulsar "ENTRAR", tu cuenta ya ha sido creada.
+
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 000814" src="https://github.com/user-attachments/assets/bfd26414-0c95-4fd5-8414-9b9b5dcb1b19" />
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 001614" src="https://github.com/user-attachments/assets/7dfab50b-ac9f-437a-9311-16fcde9ebabb" />
+
+Ya estas lista para crear tu primer compañero de meditacion pulsando "Crear Buddy", se desplegará una nueva pagina donde puedes seleccionar un avatar que prefieras, escribir un nombre y "Crear Buddy".
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 001644" src="https://github.com/user-attachments/assets/c418b614-62a7-4f17-881d-0da81413bc01" />
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 002710" src="https://github.com/user-attachments/assets/531de2a9-0ffa-485a-9307-91de331e2f57" />
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 003547" src="https://github.com/user-attachments/assets/ddfd7cfc-bb7e-4d93-92f5-d88039462a3c" />
+
+Una vez creado volverás a tu dashboard donde puedes abrir la tarjeta de tu primer buddy.
+Allí, tienes dos opciones:
+
+<img width="960" height="600" alt="Screenshot 2025-10-23 003800" src="https://github.com/user-attachments/assets/09796f65-00fb-4fa2-bf6e-c51974f6e21b" />
+
+-Abrazar: aporta un 10% de felicidad y corazones flotan a tu alrededor, tiene un cooldown, no puedes apabullar de amor a tu nuevo buddy.
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 004423" src="https://github.com/user-attachments/assets/7efffa7d-cefc-4df6-82a0-96788db9159f" />
+
+-Meditar: se despliega la pagina de diseño de sesion de meditación, donde puedes seleccionar el destino geografico al cual viajar con tu buddy y los minutos que deseas meditar.
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 004029" src="https://github.com/user-attachments/assets/7c9d7fd6-76de-4fc1-b604-fcc36302186d" />
+
+Si pulsas "Comenzar Meditacion" directamente te transportará al destino seleccionado, donde un sonido y un mensaje inspirador te darán el primer aliento.
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 004453" src="https://github.com/user-attachments/assets/470ca34d-905a-4099-bb02-4d155144f200" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cb28563f-4eae-4498-8e9e-d26fdc888202" />
+
+Cada minuto meditado te aportará 3pts de experiencia y 1pt de felicidad, todas tus sesiones quedaran registradas en el historial.
+
+<img width="1920" height="1200" alt="Screenshot 2025-10-23 010821" src="https://github.com/user-attachments/assets/8011b094-2f7b-4977-9d25-6e82a67b183b" />
+
+Tus buddys evolucionaran cada vez que alcances 100pts de experiencia, añadiendo nuevas caracteristica zen al personaje, estas son todos los niveles que puedes alcanzar de momento.
+
+<img width="1920" height="1200" alt="Screenshot 2025-09-20 221004" src="https://github.com/user-attachments/assets/c815edf7-98bb-4506-85e6-ac5ff59eecef" />
+
+
+Por otro lado, existe la pagina de gestion del administrador:
+
+**WORK IN PROGRESS**
 
 
 
